@@ -13,9 +13,9 @@ const filterOptions: { key: GenderFilter; label: string }[] = [
 type Product = {
   id: number;
   name: string;
-  imageUrl: string; // API 응답에 따라 image 또는 imageUrl로 맞춰주세요
-  brand: string;
-  price: number;
+  imageURL: string;
+  brandInfo?: { name: string };
+  price?: { sellingPrice: number };
 };
 
 const Section = styled.section`
@@ -169,7 +169,10 @@ const RankingSection = () => {
         return res.json();
       })
       .then((data) => {
-        setProducts(Array.isArray(data) ? data : data.data || []);
+        const productsData = Array.isArray(data) ? data : data.data || [];
+        console.log('[RankingSection] API 응답:', data);
+        console.log('[RankingSection] productsData:', productsData);
+        setProducts(productsData);
         setLoading(false);
         setShowAll(false); // 필터 변경 시 자동으로 접기
       })
@@ -208,15 +211,23 @@ const RankingSection = () => {
         ))}
       </FilterRow>
       <Grid>
-        {visibleProducts.map((item, idx) => (
-          <Card key={item.id}>
-            <RankBadge>{idx + 1}</RankBadge>
-            <ProductImg src={item.imageUrl} alt={item.name} />
-            <Brand>{item.brand}</Brand>
-            <ProductName>{item.name}</ProductName>
-            <Price>{item.price.toLocaleString()}원</Price>
-          </Card>
-        ))}
+        {visibleProducts.map((item, idx) => {
+          console.log('[RankingSection] product item:', item);
+          return (
+            <Card key={item.id}>
+              <RankBadge>{idx + 1}</RankBadge>
+              <ProductImg src={item.imageURL} alt={item.name} />
+              <Brand>{item.brandInfo?.name}</Brand>
+              <ProductName>{item.name}</ProductName>
+              <Price>
+                {typeof item.price?.sellingPrice === "number"
+                  ? item.price.sellingPrice.toLocaleString()
+                  : "가격 정보 없음"
+                }원
+              </Price>
+            </Card>
+          );
+        })}
       </Grid>
       {products.length > VISIBLE_COUNT && (
         <MoreBtn onClick={() => setShowAll(v => !v)}>
