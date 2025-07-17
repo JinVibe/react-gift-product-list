@@ -44,6 +44,10 @@ const RankingSection = () => {
 
   // 다음 단계에서 로딩/에러/데이터 없음 처리 추가 예정
 
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <div>
       {/* 필터 UI */}
