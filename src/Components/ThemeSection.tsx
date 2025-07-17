@@ -32,6 +32,10 @@ const ThemeSection = () => {
 
   // 다음 단계에서 로딩/에러/데이터 없음 처리 추가 예정
 
+  if (loading) {
+    return <div>로딩 중...</div>; // 또는 스피너 등 원하는 로딩 UI로 변경 가능
+  }
+
   return (
     <div>
       {/* 테마 목록 렌더링 */}
