@@ -13,7 +13,7 @@ const filterOptions: { key: GenderFilter; label: string }[] = [
 type Product = {
   id: number;
   name: string;
-  imageUrl: string;
+  imageUrl: string; // API 응답에 따라 image 또는 imageUrl로 맞춰주세요
   brand: string;
   price: number;
 };
@@ -133,11 +133,31 @@ const Price = styled.span`
   display: block;
 `;
 
+const MoreBtn = styled.button`
+  display: block;
+  margin: 0 auto 0 auto;
+  background: ${({ theme }) => theme.colors.gray.gray100};
+  color: ${({ theme }) => theme.colors.blue.blue700};
+  border: none;
+  border-radius: 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 12px 36px;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background 0.2s;
+  &:hover {
+    background: ${({ theme }) => theme.colors.blue.blue100};
+  }
+`;
+
 const RankingSection = () => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<GenderFilter>('all');
+  const [showAll, setShowAll] = useState(false);
+  const VISIBLE_COUNT = 6;
 
   useEffect(() => {
     setLoading(true);
@@ -151,6 +171,7 @@ const RankingSection = () => {
       .then((data) => {
         setProducts(Array.isArray(data) ? data : data.data || []);
         setLoading(false);
+        setShowAll(false); // 필터 변경 시 자동으로 접기
       })
       .catch(() => {
         setError(true);
@@ -170,6 +191,8 @@ const RankingSection = () => {
     return <div>상품 목록이 없습니다</div>;
   }
 
+  const visibleProducts = showAll ? products : products.slice(0, VISIBLE_COUNT);
+
   return (
     <Section>
       <Title>실시간 급상승 선물랭킹</Title>
@@ -185,7 +208,7 @@ const RankingSection = () => {
         ))}
       </FilterRow>
       <Grid>
-        {products.map((item, idx) => (
+        {visibleProducts.map((item, idx) => (
           <Card key={item.id}>
             <RankBadge>{idx + 1}</RankBadge>
             <ProductImg src={item.imageUrl} alt={item.name} />
@@ -195,6 +218,11 @@ const RankingSection = () => {
           </Card>
         ))}
       </Grid>
+      {products.length > VISIBLE_COUNT && (
+        <MoreBtn onClick={() => setShowAll(v => !v)}>
+          {showAll ? "접기" : "더보기"}
+        </MoreBtn>
+      )}
     </Section>
   );
 };
