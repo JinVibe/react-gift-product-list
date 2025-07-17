@@ -1,11 +1,62 @@
+import styled from '@emotion/styled'
 import React, { useEffect, useState } from "react";
 
-// 테마 타입 정의 (필요에 따라 수정)
 type Theme = {
-  id: number;
+  id?: number;
+  themeId?: number;
   name: string;
-  // 필요한 필드 추가
+  image?: string;
 };
+
+const SectionWrapper = styled.div`
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 0 0 0;
+`
+
+const Title = styled.h2`
+  ${({ theme }) => theme.typography.title1Bold};
+  color: ${({ theme }) => theme.colors.gray.gray900};
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+`
+
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 32px 0;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  @media (max-width: 600px) {
+    gap: 20px 0;
+  }
+`
+
+const CategoryItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`
+
+const CategoryImage = styled.img`
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  object-fit: cover;
+  background: ${({ theme }) => theme.colors.gray.gray100};
+  margin-bottom: 10px;
+  border: none;
+`
+
+const CategoryName = styled.div`
+  ${({ theme }) => theme.typography.body1Bold};
+  color: ${({ theme }) => theme.colors.gray.gray900};
+  text-align: center;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+`
 
 const ThemeSection = () => {
   const [themes, setThemes] = useState<Theme[] | null>(null);
@@ -21,28 +72,44 @@ const ThemeSection = () => {
         return res.json();
       })
       .then((data) => {
-        setThemes(data);
+        if (Array.isArray(data)) {
+          setThemes(data);
+        } else if (Array.isArray(data.data)) {
+          setThemes(data.data);
+        } else if (Array.isArray(data.themes)) {
+          setThemes(data.themes);
+        } else {
+          setThemes([]);
+        }
         setLoading(false);
       })
       .catch(() => {
+        setThemes(null);
         setError(true);
         setLoading(false);
       });
   }, []);
 
-  // 다음 단계에서 로딩/에러/데이터 없음 처리 추가 예정
-
   if (loading) {
-    return <div>로딩 중...</div>; // 또는 스피너 등 원하는 로딩 UI로 변경 가능
+    return <div>로딩 중...</div>;
+  }
+
+  if (error || !Array.isArray(themes) || themes.length === 0) {
+    return null;
   }
 
   return (
-    <div>
-      {/* 테마 목록 렌더링 */}
-      {themes && themes.map((theme) => (
-        <div key={theme.id}>{theme.name}</div>
-      ))}
-    </div>
+    <SectionWrapper>
+      <Title>선물 테마</Title>
+      <GridContainer>
+        {themes.map((theme) => (
+          <CategoryItem key={theme.themeId || theme.id}>
+            <CategoryImage src={theme.image} alt={theme.name} />
+            <CategoryName>{theme.name}</CategoryName>
+          </CategoryItem>
+        ))}
+      </GridContainer>
+    </SectionWrapper>
   );
 };
 
