@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
-import styled from '@emotion/styled';
+import { useEffect, useState } from "react";
 
-// 필터 타입 및 옵션 정의
 type GenderFilter = 'all' | 'male' | 'female' | 'teen';
 const filterOptions: { key: GenderFilter; label: string }[] = [
   { key: 'all', label: '전체' },
@@ -13,165 +11,19 @@ const filterOptions: { key: GenderFilter; label: string }[] = [
 type Product = {
   id: number;
   name: string;
-  imageURL: string;
-  brandInfo?: { name: string };
-  price?: { sellingPrice: number };
-  rankingType?: 'wanted' | 'given' | 'wished'; // 추가
+  image: string;
 };
-
-const Section = styled.section`
-  width: 100%;
-  margin: 40px 0 0 0;
-`;
-
-const Title = styled.h2`
-  ${({ theme }) => theme.typography.title1Bold};
-  color: ${({ theme }) => theme.colors.gray.gray900};
-  margin-bottom: 18px;
-  text-align: left;
-`;
-
-const FilterRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 18px;
-  justify-content: center;
-`;
-
-const FilterBtn = styled.button<{active?: boolean}>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: ${({active, theme}) => active ? theme.colors.blue.blue700 : theme.colors.gray.gray100};
-  color: ${({active, theme}) => active ? theme.colors.gray.gray00 : theme.colors.gray.gray900};
-  border: none;
-  border-radius: 50%;
-  width: 56px;
-  height: 56px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: none;
-  margin-bottom: 4px;
-  transition: background 0.2s;
-`;
-
-const FilterLabel = styled.span`
-  font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.gray.gray900};
-  margin-top: 2px;
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px 16px;
-  margin-bottom: 32px;
-
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Card = styled.article`
-  background: ${({ theme }) => theme.colors.gray.gray00};
-  border-radius: 16px;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
-  padding: 18px 16px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  position: relative;
-  cursor: pointer;
-`;
-
-const RankBadge = styled.span`
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: ${({ theme }) => theme.colors.red.red600};
-  color: ${({ theme }) => theme.colors.gray.gray00};
-  font-weight: 700;
-  font-size: 1.1rem;
-  border-radius: 8px;
-  padding: 2px 10px;
-  z-index: 2;
-`;
-
-const ProductImg = styled.img`
-  width: 100%;
-  aspect-ratio: 1/1;
-  border-radius: 12px;
-  object-fit: cover;
-  background: ${({ theme }) => theme.colors.gray.gray200};
-  margin-bottom: 14px;
-`;
-
-const Brand = styled.span`
-  ${({ theme }) => theme.typography.label1Bold};
-  color: ${({ theme }) => theme.colors.gray.gray600};
-  margin-bottom: 2px;
-  display: block;
-`;
-
-const ProductName = styled.p`
-  ${({ theme }) => theme.typography.body1Bold};
-  color: ${({ theme }) => theme.colors.gray.gray900};
-  line-height: 1.3;
-  margin-bottom: 6px;
-  word-break: keep-all;
-`;
-
-const Price = styled.span`
-  ${({ theme }) => theme.typography.title2Bold};
-  color: ${({ theme }) => theme.colors.gray.gray900};
-  margin-top: 2px;
-  display: block;
-`;
-
-const MoreBtn = styled.button`
-  display: block;
-  margin: 0 auto 0 auto;
-  background: ${({ theme }) => theme.colors.gray.gray100};
-  color: ${({ theme }) => theme.colors.blue.blue700};
-  border: none;
-  border-radius: 24px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  padding: 12px 36px;
-  cursor: pointer;
-  box-shadow: none;
-  transition: background 0.2s;
-  &:hover {
-    background: ${({ theme }) => theme.colors.blue.blue100};
-  }
-`;
-
-// 랭킹 타입 필터 상수 및 타입 추가
-const rankingTypeOptions = [
-  { key: 'wanted', label: '받고 싶어한' },
-  { key: 'given', label: '많이 선물한' },
-  { key: 'wished', label: '위시로 받은' },
-] as const;
-type RankingType = typeof rankingTypeOptions[number]['key'];
 
 const RankingSection = () => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<GenderFilter>('all');
-  const [rankingType, setRankingType] = useState<RankingType>('wanted'); // 추가
-  const [showAll, setShowAll] = useState(false);
-  const VISIBLE_COUNT = 6;
 
   useEffect(() => {
     setLoading(true);
     setError(false);
+    // 필터에 따라 API 쿼리 파라미터 추가
     const url = filter === 'all' ? '/api/products/ranking' : `/api/products/ranking?gender=${filter}`;
     fetch(url)
       .then((res) => {
@@ -179,16 +31,8 @@ const RankingSection = () => {
         return res.json();
       })
       .then((data) => {
-        const productsData = Array.isArray(data) ? data : data.data || [];
-        // 임시로 rankingType을 순환 부여
-        const rankingTypes = ['wanted', 'given', 'wished'];
-        const productsWithType = productsData.map((p: Product, i: number) => ({
-          ...p,
-          rankingType: rankingTypes[i % rankingTypes.length]
-        }));
-        setProducts(productsWithType);
+        setProducts(Array.isArray(data) ? data : data.data || []);
         setLoading(false);
-        setShowAll(false); // 필터 변경 시 자동으로 접기
       })
       .catch(() => {
         setError(true);
@@ -208,67 +52,32 @@ const RankingSection = () => {
     return <div>상품 목록이 없습니다</div>;
   }
 
-  // 랭킹 타입에 따라 상품 필터링
-  const filteredProducts = products.filter(product => product.rankingType === rankingType);
-  const visibleProducts = showAll ? filteredProducts : filteredProducts.slice(0, VISIBLE_COUNT);
-
   return (
-    <Section>
-      <Title>실시간 급상승 선물랭킹</Title>
-      <FilterRow>
+    <div>
+      {/* 필터 UI */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
         {filterOptions.map(opt => (
-          <FilterBtn
-            key={opt.key}
-            active={filter === opt.key}
-            onClick={() => setFilter(opt.key)}
-          >
-            <FilterLabel>{opt.label}</FilterLabel>
-          </FilterBtn>
-        ))}
-      </FilterRow>
-      {/* 랭킹 타입 필터 버튼 추가 */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-        {rankingTypeOptions.map(opt => (
           <button
             key={opt.key}
-            onClick={() => setRankingType(opt.key)}
+            onClick={() => setFilter(opt.key)}
             style={{
-              background: rankingType === opt.key ? '#4A90E2' : '#F0F0F0',
-              color: rankingType === opt.key ? '#fff' : '#222',
+              padding: '8px 16px',
+              borderRadius: 8,
               border: 'none',
-              borderRadius: 16,
-              padding: '10px 24px',
-              margin: '0 8px',
-              fontWeight: 700,
-              cursor: 'pointer'
+              background: filter === opt.key ? '#f7e244' : '#eee',
+              fontWeight: filter === opt.key ? 700 : 400,
+              cursor: 'pointer',
             }}
           >
             {opt.label}
           </button>
         ))}
       </div>
-      <Grid>
-        {visibleProducts.map((item, idx) => (
-          <Card key={item.id}>
-            <RankBadge>{idx + 1}</RankBadge>
-            <ProductImg src={item.imageURL} alt={item.name} />
-            <Brand>{item.brandInfo?.name}</Brand>
-            <ProductName>{item.name}</ProductName>
-            <Price>
-              {typeof item.price?.sellingPrice === "number"
-                ? item.price.sellingPrice.toLocaleString()
-                : "가격 정보 없음"
-              }원
-            </Price>
-          </Card>
-        ))}
-      </Grid>
-      {filteredProducts.length > VISIBLE_COUNT && (
-        <MoreBtn onClick={() => setShowAll(v => !v)}>
-          {showAll ? "접기" : "더보기"}
-        </MoreBtn>
-      )}
-    </Section>
+      {/* 상품 랭킹 목록 렌더링 */}
+      {products && products.map((product) => (
+        <div key={product.id}>{product.name}</div>
+      ))}
+    </div>
   );
 };
 
