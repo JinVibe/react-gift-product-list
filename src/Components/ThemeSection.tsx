@@ -20,10 +20,11 @@ const ThemeSection = () => {
       })
       .then((data) => {
         setThemes(data);
-        setLoading(false);
       })
       .catch(() => {
         setError(true);
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);
