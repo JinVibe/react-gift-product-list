@@ -16,6 +16,7 @@ type Product = {
   imageURL: string;
   brandInfo?: { name: string };
   price?: { sellingPrice: number };
+  rankingType?: 'wanted' | 'given' | 'wished'; // 추가
 };
 
 const Section = styled.section`
@@ -151,11 +152,20 @@ const MoreBtn = styled.button`
   }
 `;
 
+// 랭킹 타입 필터 상수 및 타입 추가
+const rankingTypeOptions = [
+  { key: 'wanted', label: '받고 싶어한' },
+  { key: 'given', label: '많이 선물한' },
+  { key: 'wished', label: '위시로 받은' },
+] as const;
+type RankingType = typeof rankingTypeOptions[number]['key'];
+
 const RankingSection = () => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<GenderFilter>('all');
+  const [rankingType, setRankingType] = useState<RankingType>('wanted'); // 추가
   const [showAll, setShowAll] = useState(false);
   const VISIBLE_COUNT = 6;
 
@@ -170,9 +180,13 @@ const RankingSection = () => {
       })
       .then((data) => {
         const productsData = Array.isArray(data) ? data : data.data || [];
-        console.log('[RankingSection] API 응답:', data);
-        console.log('[RankingSection] productsData:', productsData);
-        setProducts(productsData);
+        // 임시로 rankingType을 순환 부여
+        const rankingTypes = ['wanted', 'given', 'wished'];
+        const productsWithType = productsData.map((p: Product, i: number) => ({
+          ...p,
+          rankingType: rankingTypes[i % rankingTypes.length]
+        }));
+        setProducts(productsWithType);
         setLoading(false);
         setShowAll(false); // 필터 변경 시 자동으로 접기
       })
@@ -194,7 +208,9 @@ const RankingSection = () => {
     return <div>상품 목록이 없습니다</div>;
   }
 
-  const visibleProducts = showAll ? products : products.slice(0, VISIBLE_COUNT);
+  // 랭킹 타입에 따라 상품 필터링
+  const filteredProducts = products.filter(product => product.rankingType === rankingType);
+  const visibleProducts = showAll ? filteredProducts : filteredProducts.slice(0, VISIBLE_COUNT);
 
   return (
     <Section>
@@ -210,26 +226,44 @@ const RankingSection = () => {
           </FilterBtn>
         ))}
       </FilterRow>
+      {/* 랭킹 타입 필터 버튼 추가 */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+        {rankingTypeOptions.map(opt => (
+          <button
+            key={opt.key}
+            onClick={() => setRankingType(opt.key)}
+            style={{
+              background: rankingType === opt.key ? '#4A90E2' : '#F0F0F0',
+              color: rankingType === opt.key ? '#fff' : '#222',
+              border: 'none',
+              borderRadius: 16,
+              padding: '10px 24px',
+              margin: '0 8px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
       <Grid>
-        {visibleProducts.map((item, idx) => {
-          console.log('[RankingSection] product item:', item);
-          return (
-            <Card key={item.id}>
-              <RankBadge>{idx + 1}</RankBadge>
-              <ProductImg src={item.imageURL} alt={item.name} />
-              <Brand>{item.brandInfo?.name}</Brand>
-              <ProductName>{item.name}</ProductName>
-              <Price>
-                {typeof item.price?.sellingPrice === "number"
-                  ? item.price.sellingPrice.toLocaleString()
-                  : "가격 정보 없음"
-                }원
-              </Price>
-            </Card>
-          );
-        })}
+        {visibleProducts.map((item, idx) => (
+          <Card key={item.id}>
+            <RankBadge>{idx + 1}</RankBadge>
+            <ProductImg src={item.imageURL} alt={item.name} />
+            <Brand>{item.brandInfo?.name}</Brand>
+            <ProductName>{item.name}</ProductName>
+            <Price>
+              {typeof item.price?.sellingPrice === "number"
+                ? item.price.sellingPrice.toLocaleString()
+                : "가격 정보 없음"
+              }원
+            </Price>
+          </Card>
+        ))}
       </Grid>
-      {products.length > VISIBLE_COUNT && (
+      {filteredProducts.length > VISIBLE_COUNT && (
         <MoreBtn onClick={() => setShowAll(v => !v)}>
           {showAll ? "접기" : "더보기"}
         </MoreBtn>
