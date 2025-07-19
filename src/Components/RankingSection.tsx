@@ -1,66 +1,58 @@
-import styled from '@emotion/styled'
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
-import { useLoginContext } from '@/contexts/LoginContext'
-import { products } from '@/data/products'
-import PersonIcon from '@mui/icons-material/Person'
+import { useEffect, useState } from "react";
+import styled from '@emotion/styled';
 
-// 타입 정의
-export type FilterKey = 'all' | 'female' | 'male' | 'teen'
-export type TabKey = 'want' | 'many' | 'wish'
+// 상수 및 타입 선언
+const VISIBLE_COUNT = 6;
 
-const filterKeys = ['all', 'female', 'male', 'teen'] as const;
-const tabKeys = ['want', 'many', 'wish'] as const;
+type GenderFilter = 'all' | 'male' | 'female' | 'teen';
+const filterOptions: { key: GenderFilter; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'male', label: '남자' },
+  { key: 'female', label: '여자' },
+  { key: 'teen', label: '청소년' },
+];
 
-function isFilterKey(value: any): value is FilterKey {
-  return filterKeys.includes(value);
-}
-function isTabKey(value: any): value is TabKey {
-  return tabKeys.includes(value);
-}
+const rankingTypeOptions = [
+  { key: 'wanted', label: '받고 싶어한' },
+  { key: 'given', label: '많이 선물한' },
+  { key: 'wished', label: '위시로 받은' },
+] as const;
+type RankingType = typeof rankingTypeOptions[number]['key'];
 
-const filters: { key: FilterKey; label: string; icon: React.ReactNode }[] = [
-  { key: 'all', label: '전체', icon: null },
-  { key: 'female', label: '여성', icon: <PersonIcon style={{fontSize: 28}} /> },
-  { key: 'male', label: '남성', icon: <PersonIcon style={{fontSize: 28}} /> },
-  { key: 'teen', label: '청소년', icon: <PersonIcon style={{fontSize: 28}} /> },
-]
+type Product = {
+  id: number;
+  name: string;
+  imageURL: string;
+  brandInfo?: { name: string };
+  price?: { sellingPrice: number };
+  rankingType?: RankingType;
+};
 
-const tabList: { key: TabKey; label: string }[] = [
-  { key: 'want', label: '받고 싶어한' },
-  { key: 'many', label: '많이 선물한' },
-  { key: 'wish', label: '위시로 받은' },
-]
-
-const rankingData = products;
-
+// styled-components 선언
 const Section = styled.section`
   width: 100%;
   margin: 40px 0 0 0;
-`
-
+`;
 const Title = styled.h2`
-  ${({ theme }) => theme.typography.title1Bold};
-  color: ${({ theme }) => theme.colors.gray.gray900};
+  font-size: 2rem;
+  font-weight: bold;
   margin-bottom: 18px;
   text-align: left;
-`
-
+`;
 const FilterRow = styled.div`
   display: flex;
   align-items: center;
   gap: 24px;
   margin-bottom: 18px;
   justify-content: center;
-`
-
+`;
 const FilterBtn = styled.button<{active?: boolean}>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: ${({active, theme}) => active ? theme.colors.blue.blue700 : theme.colors.gray.gray100};
-  color: ${({active, theme}) => active ? theme.colors.gray.gray00 : theme.colors.gray.gray900};
+  background: ${({active}) => active ? '#4A90E2' : '#F0F0F0'};
+  color: ${({active}) => active ? '#fff' : '#222'};
   border: none;
   border-radius: 50%;
   width: 56px;
@@ -68,57 +60,28 @@ const FilterBtn = styled.button<{active?: boolean}>`
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: none;
   margin-bottom: 4px;
   transition: background 0.2s;
-`
-
+`;
 const FilterLabel = styled.span`
   font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.gray.gray900};
+  color: #222;
   margin-top: 2px;
-`
-
-const TabRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: ${({ theme }) => theme.colors.blue.blue00};
-  border-radius: 12px;
-  margin-bottom: 24px;
-  padding: 0 0;
-  height: 48px;
-  overflow: hidden;
-`
-
-const TabBtn = styled.button<{active?: boolean}>`
-  flex: 1;
-  height: 100%;
-  background: ${({active, theme}) => active ? theme.colors.blue.blue200 : 'transparent'};
-  color: ${({active, theme}) => active ? theme.colors.blue.blue700 : theme.colors.gray.gray600};
-  border: none;
-  font-size: 1.08rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-`
-
+`;
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px 16px;
   margin-bottom: 32px;
-
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
   }
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
   }
-`
-
+`;
 const Card = styled.article`
-  background: ${({ theme }) => theme.colors.gray.gray00};
+  background: #fff;
   border-radius: 16px;
   box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
   padding: 18px 16px 16px 16px;
@@ -127,57 +90,51 @@ const Card = styled.article`
   align-items: flex-start;
   position: relative;
   cursor: pointer;
-`
-
+`;
 const RankBadge = styled.span`
   position: absolute;
   top: 12px;
   left: 12px;
-  background: ${({ theme }) => theme.colors.red.red600};
-  color: ${({ theme }) => theme.colors.gray.gray00};
+  background: #e74c3c;
+  color: #fff;
   font-weight: 700;
   font-size: 1.1rem;
   border-radius: 8px;
   padding: 2px 10px;
   z-index: 2;
-`
-
+`;
 const ProductImg = styled.img`
   width: 100%;
   aspect-ratio: 1/1;
   border-radius: 12px;
   object-fit: cover;
-  background: ${({ theme }) => theme.colors.gray.gray200};
+  background: #eee;
   margin-bottom: 14px;
-`
-
+`;
 const Brand = styled.span`
-  ${({ theme }) => theme.typography.label1Bold};
-  color: ${({ theme }) => theme.colors.gray.gray600};
+  font-weight: bold;
+  color: #888;
   margin-bottom: 2px;
   display: block;
-`
-
+`;
 const ProductName = styled.p`
-  ${({ theme }) => theme.typography.body1Bold};
-  color: ${({ theme }) => theme.colors.gray.gray900};
+  font-weight: bold;
+  color: #222;
   line-height: 1.3;
   margin-bottom: 6px;
   word-break: keep-all;
-`
-
+`;
 const Price = styled.span`
-  ${({ theme }) => theme.typography.title2Bold};
-  color: ${({ theme }) => theme.colors.gray.gray900};
+  font-size: 1.1rem;
+  color: #222;
   margin-top: 2px;
   display: block;
-`
-
+`;
 const MoreBtn = styled.button`
   display: block;
   margin: 0 auto 0 auto;
-  background: ${({ theme }) => theme.colors.gray.gray100};
-  color: ${({ theme }) => theme.colors.blue.blue700};
+  background: #F0F0F0;
+  color: #4A90E2;
   border: none;
   border-radius: 24px;
   font-size: 1.1rem;
@@ -187,90 +144,99 @@ const MoreBtn = styled.button`
   box-shadow: none;
   transition: background 0.2s;
   &:hover {
-    background: ${({ theme }) => theme.colors.blue.blue100};
+    background: #eaf4ff;
   }
-`
-
-const FILTER_KEY = 'ranking_selected_filter'
-const TAB_KEY = 'ranking_selected_tab'
+`;
 
 const RankingSection = () => {
-  const navigate = useNavigate();
-  const { isLoggedIn } = useLoginContext();
-  // localStorage에서 초기값 불러오기
-  const getInitialFilter = () => {
-    const saved = localStorage.getItem(FILTER_KEY)
-    if (isFilterKey(saved)) return saved
-    return 'all'
-  }
-  const getInitialTab = () => {
-    const saved = localStorage.getItem(TAB_KEY)
-    if (isTabKey(saved)) return saved
-    return 'want'
-  }
+  const [products, setProducts] = useState<Product[] | null>(null);
+  const [filter, setFilter] = useState<GenderFilter>('all');
+  const [rankingType, setRankingType] = useState<RankingType>('wanted');
+  const [showAll, setShowAll] = useState(false);
 
-  const [selectedFilter, setSelectedFilter] = useState<FilterKey>(getInitialFilter)
-  const [selectedTab, setSelectedTab] = useState<TabKey>(getInitialTab)
-
-  // 상태 변경 + localStorage 저장을 명시적으로 처리
-  const handleFilterChange = (filter: FilterKey) => {
-    setSelectedFilter(filter);
-    localStorage.setItem(FILTER_KEY, filter);
-  }
-  const handleTabChange = (tab: TabKey) => {
-    setSelectedTab(tab);
-    localStorage.setItem(TAB_KEY, tab);
-  }
+  useEffect(() => {
+    fetch(filter === 'all' ? '/api/products/ranking' : `/api/products/ranking?gender=${filter}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("API Error");
+        return res.json();
+      })
+      .then((data) => {
+        const productsData = Array.isArray(data) ? data : data.data || [];
+        const rankingTypes = ['wanted', 'given', 'wished'];
+        const productsWithType = productsData.map((p: Product, i: number) => ({
+          ...p,
+          rankingType: rankingTypes[i % rankingTypes.length]
+        }));
+        setProducts(productsWithType);
+        setShowAll(false); // 필터 변경 시 자동으로 접기
+      });
+  }, [filter]);
 
   return (
     <Section>
       <Title>실시간 급상승 선물랭킹</Title>
       <FilterRow>
-        {filters.map(f => (
+        {filterOptions.map(opt => (
           <FilterBtn
-            key={f.key}
-            active={selectedFilter === f.key}
-            onClick={() => handleFilterChange(f.key)}
+            key={opt.key}
+            active={filter === opt.key}
+            onClick={() => setFilter(opt.key)}
           >
-            {f.icon}
-            <FilterLabel>{f.label}</FilterLabel>
+            <FilterLabel>{opt.label}</FilterLabel>
           </FilterBtn>
         ))}
       </FilterRow>
-      <TabRow>
-        {tabList.map(tab => (
-          <TabBtn
-            key={tab.key}
-            active={selectedTab === tab.key}
-            onClick={() => handleTabChange(tab.key)}
-          >
-            {tab.label}
-          </TabBtn>
-        ))}
-      </TabRow>
-      <Grid>
-        {rankingData.map((item) => (
-          <Card
-            key={item.id}
-            onClick={() => {
-              if (isLoggedIn) {
-                navigate(`/order/${item.id}`);
-              } else {
-                navigate('/login', { state: { redirect: `/order/${item.id}` } });
-              }
+      {/* 랭킹 타입 필터 버튼 */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+        {rankingTypeOptions.map(opt => (
+          <button
+            key={opt.key}
+            onClick={() => setRankingType(opt.key)}
+            style={{
+              background: rankingType === opt.key ? '#4A90E2' : '#F0F0F0',
+              color: rankingType === opt.key ? '#fff' : '#222',
+              border: 'none',
+              borderRadius: 16,
+              padding: '10px 24px',
+              margin: '0 8px',
+              fontWeight: 700,
+              cursor: 'pointer'
             }}
           >
-            <RankBadge>{item.id}</RankBadge>
-            <ProductImg src={item.imageUrl} alt={item.name} />
-            <Brand>{item.brand}</Brand>
-            <ProductName>{item.name}</ProductName>
-            <Price>{item.price.toLocaleString()} 원</Price>
-          </Card>
+            {opt.label}
+          </button>
         ))}
-      </Grid>
-      <MoreBtn>더보기</MoreBtn>
+      </div>
+      {/* 상품 리스트 또는 상품 없음 메시지 */}
+      {products && products.filter(product => product.rankingType === rankingType).length === 0 ? (
+        <div>상품 목록이 없습니다</div>
+      ) : (
+        <>
+          <Grid>
+            {products && products.filter(product => product.rankingType === rankingType).slice(0, showAll ? undefined : VISIBLE_COUNT).map((item, idx) => (
+              <Card key={item.id}>
+                <RankBadge>{idx + 1}</RankBadge>
+                <ProductImg src={item.imageURL} alt={item.name} />
+                <Brand>{item.brandInfo?.name}</Brand>
+                <ProductName>{item.name}</ProductName>
+                <Price>
+                  {typeof item.price?.sellingPrice === "number"
+                    ? item.price.sellingPrice.toLocaleString()
+                    : "가격 정보 없음"
+                  }원
+                </Price>
+              </Card>
+            ))}
+          </Grid>
+          {products && products.filter(product => product.rankingType === rankingType).length > VISIBLE_COUNT && (
+            <MoreBtn onClick={() => setShowAll(v => !v)}>
+              {showAll ? "접기" : "더보기"}
+            </MoreBtn>
+          )}
+        </>
+      )}
     </Section>
-  )
-}
+  );
+};
 
-export default RankingSection
+export default RankingSection;
