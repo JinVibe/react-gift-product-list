@@ -267,6 +267,10 @@ const ProductPrice = styled.div`
 `;
 
 // ===== 레이아웃 관련 스타일 =====
+const ContentWrapper = styled.div`
+  padding-bottom: 100px; // 푸터 높이만큼 여백
+`;
+
 const FixedFooter = styled.div`
   position: fixed;
   left: 0;
@@ -453,119 +457,119 @@ const Order = () => {
 
   return (
     <Layout>
-      {/* ===== 제품 정보 섹션 ===== */}
-      <ProductSection>
-        <ProductTitle>선택한 상품</ProductTitle>
-        <ProductBox>
-          <ProductImg src={product.imageURL} alt={product.name} />
-          <ProductInfo>
-            <ProductName>{product.name}</ProductName>
-            <div style={{ color: '#666', fontSize: '0.95rem' }}>
-              {product.brandName}
+      <ContentWrapper>
+        {/* ===== 카드 선택 섹션 ===== */}
+        <h2>카드 템플릿 선택</h2>
+        <CardList>
+          {cardTemplates.map(card => (
+            <CardItem
+              key={card.id}
+              selected={watch("selectedCardId") === card.id}
+              onClick={() => handleSelect(card.id)}
+            >
+              <Thumb src={card.thumbUrl} alt={card.defaultTextMessage} selected={watch("selectedCardId") === card.id} />
+            </CardItem>
+          ))}
+        </CardList>
+
+        {/* ===== 카드 미리보기 섹션 ===== */}
+        <PreviewWrapper>
+          {selectedCard && (
+            <>
+              <PreviewImage src={selectedCard.imageUrl} alt={selectedCard.defaultTextMessage} />
+              <MessageInput
+                {...register("message", { required: "메시지를 입력하세요." })}
+                placeholder="메시지를 입력하세요."
+              />
+              {errors.message && <ErrorMessage>{errors.message.message}</ErrorMessage>}
+            </>
+          )}
+        </PreviewWrapper>
+
+        {/* ===== 보내는 사람 섹션 ===== */}
+        <SenderSection>
+          <SenderTitle>보내는 사람</SenderTitle>
+          <SenderInput
+            type="text"
+            placeholder="이름을 입력하세요."
+            defaultValue={senderName}
+            {...register("sender", { required: "보내는 사람 이름을 입력하세요." })}
+          />
+          {errors.sender && <ErrorMessage>{errors.sender.message}</ErrorMessage>}
+          <SenderGuide>* 실제 선물 발송 시 발신자이름으로 반영되는 정보입니다.</SenderGuide>
+        </SenderSection>
+
+        {/* ===== 받는 사람 섹션 (요약 테이블/리스트 + 추가/수정 버튼만) ===== */}
+        <ReceiverSection>
+          <ReceiverTitle>받는 사람</ReceiverTitle>
+          {/* 받는 사람 요약 테이블 */}
+          {watch("receivers").length === 0 ? (
+            <div style={{
+              minHeight: 120,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#b0b3ba',
+              background: '#fff',
+              borderRadius: 12,
+              border: '1.5px solid #e0e0e0',
+              marginBottom: 16
+            }}>
+              받는 사람이 없습니다.<br/>받는 사람을 추가해주세요.
             </div>
-            <div style={{ fontWeight: 700, color: '#222', marginTop: 4 }}>
-              {product.price?.toLocaleString()}원
-            </div>
-          </ProductInfo>
-        </ProductBox>
-      </ProductSection>
-
-      {/* ===== 카드 선택 섹션 ===== */}
-      <h2>카드 템플릿 선택</h2>
-      <CardList>
-        {cardTemplates.map(card => (
-          <CardItem
-            key={card.id}
-            selected={watch("selectedCardId") === card.id}
-            onClick={() => handleSelect(card.id)}
-          >
-            <Thumb src={card.thumbUrl} alt={card.defaultTextMessage} selected={watch("selectedCardId") === card.id} />
-          </CardItem>
-        ))}
-      </CardList>
-
-      {/* ===== 카드 미리보기 섹션 ===== */}
-      <PreviewWrapper>
-        {selectedCard && (
-          <>
-            <PreviewImage src={selectedCard.imageUrl} alt={selectedCard.defaultTextMessage} />
-            <MessageInput
-              {...register("message", { required: "메시지를 입력하세요." })}
-              placeholder="메시지를 입력하세요."
-            />
-            {errors.message && <ErrorMessage>{errors.message.message}</ErrorMessage>}
-          </>
-        )}
-      </PreviewWrapper>
-
-      {/* ===== 보내는 사람 섹션 ===== */}
-      <SenderSection>
-        <SenderTitle>보내는 사람</SenderTitle>
-        <SenderInput
-          type="text"
-          placeholder="이름을 입력하세요."
-          defaultValue={senderName}
-          {...register("sender", { required: "보내는 사람 이름을 입력하세요." })}
-        />
-        {errors.sender && <ErrorMessage>{errors.sender.message}</ErrorMessage>}
-        <SenderGuide>* 실제 선물 발송 시 발신자이름으로 반영되는 정보입니다.</SenderGuide>
-      </SenderSection>
-
-      {/* ===== 받는 사람 섹션 (요약 테이블/리스트 + 추가/수정 버튼만) ===== */}
-      <ReceiverSection>
-        <ReceiverTitle>받는 사람</ReceiverTitle>
-        {/* 받는 사람 요약 테이블 */}
-        {watch("receivers").length === 0 ? (
-          <div style={{
-            minHeight: 120,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#b0b3ba',
-            background: '#fff',
-            borderRadius: 12,
-            border: '1.5px solid #e0e0e0',
-            marginBottom: 16
-          }}>
-            받는 사람이 없습니다.<br/>받는 사람을 추가해주세요.
-          </div>
-        ) : (
-          <table style={{ width: '100%', background: '#fff', borderRadius: 12, borderCollapse: 'collapse', marginBottom: 16 }}>
-            <thead>
-              <tr style={{ background: '#f5f6fa' }}>
-                <th style={{ padding: '10px 0', fontWeight: 700 }}>이름</th>
-                <th style={{ padding: '10px 0', fontWeight: 700 }}>전화번호</th>
-                <th style={{ padding: '10px 0', fontWeight: 700 }}>수량</th>
-              </tr>
-            </thead>
-            <tbody>
-              {watch("receivers").map((r, idx) => (
-                <tr key={idx} style={{ textAlign: 'center', borderTop: '1px solid #eee' }}>
-                  <td style={{ padding: '8px 0' }}>{r.name}</td>
-                  <td style={{ padding: '8px 0' }}>{r.phone}</td>
-                  <td style={{ padding: '8px 0' }}>{r.quantity}</td>
+          ) : (
+            <table style={{ width: '100%', background: '#fff', borderRadius: 12, borderCollapse: 'collapse', marginBottom: 16 }}>
+              <thead>
+                <tr style={{ background: '#f5f6fa' }}>
+                  <th style={{ padding: '10px 0', fontWeight: 700 }}>이름</th>
+                  <th style={{ padding: '10px 0', fontWeight: 700 }}>전화번호</th>
+                  <th style={{ padding: '10px 0', fontWeight: 700 }}>수량</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <OrderButton
-          type="button"
-          onClick={openReceiverModal}
-          style={{ marginBottom: 0, background: '#f5f6fa', color: '#222', fontWeight: 500 }}
-        >
-          {watch("receivers").length === 0 ? '추가' : '수정'}
-        </OrderButton>
-      </ReceiverSection>
+              </thead>
+              <tbody>
+                {watch("receivers").map((r, idx) => (
+                  <tr key={idx} style={{ textAlign: 'center', borderTop: '1px solid #eee' }}>
+                    <td style={{ padding: '8px 0' }}>{r.name}</td>
+                    <td style={{ padding: '8px 0' }}>{r.phone}</td>
+                    <td style={{ padding: '8px 0' }}>{r.quantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <OrderButton
+            type="button"
+            onClick={openReceiverModal}
+            style={{ marginBottom: 0, background: '#f5f6fa', color: '#222', fontWeight: 500 }}
+          >
+            {watch("receivers").length === 0 ? '추가' : '수정'}
+          </OrderButton>
+        </ReceiverSection>
 
-      {/* ===== 주문 버튼 ===== */}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <OrderButton type="submit" disabled={orderLoading}>
-          {orderLoading ? "주문 처리 중..." : 
-           userInfo?.authToken ? "주문하기" : "로그인 후 주문하기"}
-        </OrderButton>
-      </form>
-
+        {/* ===== 제품 정보 섹션 (주문 버튼 위) ===== */}
+        <ProductSection>
+          <ProductTitle>선택한 상품</ProductTitle>
+          <ProductBox>
+            <ProductImg src={product.imageURL} alt={product.name} />
+            <ProductInfo>
+              <ProductName>{product.name}</ProductName>
+              <div style={{ color: '#666', fontSize: '0.95rem' }}>
+                {product.brandName}
+              </div>
+              <div style={{ fontWeight: 700, color: '#222', marginTop: 4 }}>
+                {product.price?.toLocaleString()}원
+              </div>
+            </ProductInfo>
+          </ProductBox>
+        </ProductSection>
+      </ContentWrapper>
+      <FixedFooter>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <OrderButton type="submit" disabled={orderLoading}>
+            {orderLoading ? "주문 처리 중..." : userInfo?.authToken ? "주문하기" : "로그인 후 주문하기"}
+          </OrderButton>
+        </form>
+      </FixedFooter>
       {/* ===== 받는 사람 입력/수정 모달 ===== */}
       {receiverModalOpen && (
         <ModalOverlay onClick={() => setReceiverModalOpen(false)}>
