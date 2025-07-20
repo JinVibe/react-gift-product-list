@@ -10,14 +10,16 @@ export const createOrder = async (orderData: OrderRequest, authToken: string): P
     body: JSON.stringify(orderData),
   });
 
+  const data = await response.json();
+  console.log('[API] /api/order 응답:', data);
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ message: '주문에 실패했습니다.' }));
     const error: OrderError = {
-      message: errorData.message || '주문에 실패했습니다.',
+      message: data.message || '주문에 실패했습니다.',
       status: response.status,
     };
     throw error;
   }
 
-  return response.json();
+  return data;
 }; 

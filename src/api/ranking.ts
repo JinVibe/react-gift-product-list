@@ -6,9 +6,10 @@ export const fetchRankingProducts = async (filter: GenderFilter, rankingType: Ra
     : `/api/products/ranking?gender=${filter}&type=${rankingType}`;
   
   const res = await fetch(url);
+  const data = await res.json();
+  console.log('[API] /api/products/ranking 응답:', data);
   if (!res.ok) throw new Error("API Error");
   
-  const data = await res.json();
   const productsData = Array.isArray(data) ? data : data.data || [];
   
   // 비즈니스 로직: rankingType 추가

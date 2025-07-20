@@ -448,11 +448,6 @@ const Order = () => {
     return <Layout><div>제품 정보를 불러올 수 없습니다.</div></Layout>;
   }
 
-  // 로그인되지 않은 경우 로딩 화면 표시 (리다이렉트 중)
-  if (!userInfo?.authToken) {
-    return <Layout><div>로그인 확인 중...</div></Layout>;
-  }
-
   // 선택된 카드
   const selectedCard = cardTemplates.find(card => card.id === watch("selectedCardId"));
 
@@ -466,10 +461,10 @@ const Order = () => {
           <ProductInfo>
             <ProductName>{product.name}</ProductName>
             <div style={{ color: '#666', fontSize: '0.95rem' }}>
-              {product.brandInfo?.name}
+              {product.brandName}
             </div>
             <div style={{ fontWeight: 700, color: '#222', marginTop: 4 }}>
-              {product.price?.sellingPrice?.toLocaleString()}원
+              {product.price?.toLocaleString()}원
             </div>
           </ProductInfo>
         </ProductBox>

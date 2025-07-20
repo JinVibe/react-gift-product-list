@@ -2,8 +2,8 @@ export interface ProductSummary {
   id: number;
   name: string;
   imageURL: string;
-  brandInfo?: { name: string };
-  price?: { sellingPrice: number };
+  brandName: string;
+  price: number;
   description?: string;
 }
 
