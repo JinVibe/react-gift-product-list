@@ -10,7 +10,8 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { LoginProvider } from "./contexts/LoginContext"
 import Order from './pages/Order'
-
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const muiTheme = createTheme()
 
@@ -33,6 +34,17 @@ function App() {
               <Route path="/order" element={<Navigate to="/" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
           </BrowserRouter>
         </EmotionThemeProvider>
       </LoginProvider>
