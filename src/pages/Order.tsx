@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Layout } from "@/Components/layout/Layout";
 import styled from "@emotion/styled";
 import { cardTemplates } from "@/Components/cardTemplates";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { products } from "@/data/products";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProductSummary } from "@/hooks/useProductSummary";
 import { useOrder } from "@/hooks/useOrder";
 import { getUserInfo } from "@/utils/storage";
@@ -346,6 +346,7 @@ const ModalButton = styled.button`
 
 const Order = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const productId = id ? parseInt(id) : 0;
   
   // Custom Hooks 사용
@@ -364,7 +365,7 @@ const Order = () => {
     defaultValues: {
       selectedCardId: selectedCardDefault?.id ?? 0,
       message: selectedCardDefault?.defaultTextMessage ?? "",
-      sender: senderName, // userInfo의 name을 defaultValue로 설정
+      sender: senderName, // userInfo의 name을 defaultValue로 설정 (없으면 빈 문자열)
       receivers: []
     }
   });
@@ -413,8 +414,11 @@ const Order = () => {
 
   // 주문 제출 핸들러
   const onSubmit = async (data: OrderFormValues) => {
+    // 로그인 체크 - 주문 시에만 확인
     if (!userInfo?.authToken) {
-      alert('로그인이 필요합니다.');
+      navigate('/login', { 
+        state: { redirect: `/order/${productId}` }
+      });
       return;
     }
 
@@ -442,6 +446,11 @@ const Order = () => {
 
   if (productError || !product) {
     return <Layout><div>제품 정보를 불러올 수 없습니다.</div></Layout>;
+  }
+
+  // 로그인되지 않은 경우 로딩 화면 표시 (리다이렉트 중)
+  if (!userInfo?.authToken) {
+    return <Layout><div>로그인 확인 중...</div></Layout>;
   }
 
   // 선택된 카드
@@ -557,7 +566,8 @@ const Order = () => {
       {/* ===== 주문 버튼 ===== */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <OrderButton type="submit" disabled={orderLoading}>
-          {orderLoading ? "주문 처리 중..." : "주문하기"}
+          {orderLoading ? "주문 처리 중..." : 
+           userInfo?.authToken ? "주문하기" : "로그인 후 주문하기"}
         </OrderButton>
       </form>
 

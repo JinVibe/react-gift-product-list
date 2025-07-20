@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from '@emotion/styled';
+import { useNavigate } from 'react-router-dom';
 import { useRankingProducts } from '../hooks/useRankingProducts';
 import type { GenderFilter, RankingType, Product } from '../types/ranking';
 import { rankingTypeOptions } from '../types/ranking';
@@ -135,6 +136,7 @@ const MoreBtn = styled.button`
 `;
 
 const RankingSection = () => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<GenderFilter>('all');
   const [rankingType, setRankingType] = useState<RankingType>('wanted');
   const [showAll, setShowAll] = useState(false);
@@ -145,6 +147,11 @@ const RankingSection = () => {
   // 필터링된 상품 계산
   const filteredProducts = products?.filter(product => product.rankingType === rankingType) || [];
   const visibleProducts = showAll ? filteredProducts : filteredProducts.slice(0, VISIBLE_COUNT);
+
+  // 상품 카드 클릭 핸들러
+  const handleProductClick = (productId: number) => {
+    navigate(`/order/${productId}`);
+  };
 
   return (
     <Section>
@@ -188,7 +195,7 @@ const RankingSection = () => {
         <>
           <Grid>
             {visibleProducts.map((item, idx) => (
-              <Card key={item.id}>
+              <Card key={item.id} onClick={() => handleProductClick(item.id)}>
                 <RankBadge>{idx + 1}</RankBadge>
                 <ProductImg src={item.imageURL} alt={item.name} />
                 <Brand>{item.brandInfo?.name}</Brand>
