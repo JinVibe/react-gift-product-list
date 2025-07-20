@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 import { useRankingProducts } from '../hooks/useRankingProducts';
-import type { GenderFilter, RankingType, Product } from '../types/ranking';
+import type { GenderFilter, RankingType } from '../types/ranking';
 import { rankingTypeOptions } from '../types/ranking';
 
 // 상수 및 타입 선언
@@ -142,7 +142,7 @@ const RankingSection = () => {
   const [showAll, setShowAll] = useState(false);
   
   // Custom Hook 사용
-  const { products, loading, error } = useRankingProducts(filter, rankingType);
+  const { products } = useRankingProducts(filter, rankingType);
 
   // 필터링된 상품 계산
   const filteredProducts = products?.filter(product => product.rankingType === rankingType) || [];

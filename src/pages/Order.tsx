@@ -5,8 +5,7 @@ import { Layout } from "@/Components/layout/Layout";
 import styled from "@emotion/styled";
 import { cardTemplates } from "@/Components/cardTemplates";
 import { useParams, useNavigate } from "react-router-dom";
-import { products } from "@/data/products";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useProductSummary } from "@/hooks/useProductSummary";
 import { useOrder } from "@/hooks/useOrder";
 import { getUserInfo } from "@/utils/storage";
@@ -253,19 +252,6 @@ const ProductName = styled.div`
   margin-bottom: 2px;
 `;
 
-const ProductBrand = styled.div`
-  font-size: 0.98rem;
-  color: #888;
-  margin-bottom: 2px;
-`;
-
-const ProductPrice = styled.div`
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #222;
-  margin-top: 4px;
-`;
-
 // ===== 레이아웃 관련 스타일 =====
 const ContentWrapper = styled.div`
   padding-bottom: 100px; // 푸터 높이만큼 여백
@@ -288,12 +274,6 @@ const FixedFooter = styled.div`
   }
 `;
 
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-`;
-
 // ===== 에러 메시지 스타일 =====
 const ErrorMessage = styled.div`
   color: #e74c3c;
@@ -311,6 +291,7 @@ const ModalOverlay = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
 const ModalContent = styled.div`
   background: #fff;
   border-radius: 16px;
@@ -322,17 +303,13 @@ const ModalContent = styled.div`
   flex-direction: column;
   align-items: stretch;
 `;
+
 const ModalTitle = styled.h2`
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: 18px;
 `;
-const ModalActions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-`;
+
 const ModalButton = styled.button`
   background: #f7e244;
   color: #222;
@@ -355,7 +332,7 @@ const Order = () => {
   
   // Custom Hooks 사용
   const { product, loading: productLoading, error: productError } = useProductSummary(productId);
-  const { order, isLoading: orderLoading, error: orderError } = useOrder();
+  const { order, isLoading: orderLoading } = useOrder();
   
   // userInfo에서 name 가져오기
   const userInfo = getUserInfo();
@@ -382,8 +359,6 @@ const Order = () => {
     control: modalControl,
     register: modalRegister,
     handleSubmit: modalHandleSubmit,
-    watch: modalWatch,
-    formState: { errors: modalErrors },
     reset: modalReset
   } = useForm<{ receivers: OrderFormValues["receivers"] }>({
     resolver: zodResolver(z.object({ receivers: receiversSchema })),

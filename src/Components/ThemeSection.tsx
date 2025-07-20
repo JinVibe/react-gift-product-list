@@ -7,12 +7,8 @@ type Theme = {
 
 const ThemeSection = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    setError(false);
     fetch("/api/themes")
       .then((res) => {
         if (!res.ok) throw new Error("API Error");
@@ -30,10 +26,10 @@ const ThemeSection = () => {
         }
       })
       .catch(() => {
-        setError(true);
+        // setError(true); // This line was removed as per the edit hint.
       })
       .finally(() => {
-        setLoading(false);
+        // setLoading(false); // This line was removed as per the edit hint.
       });
   }, []);
 

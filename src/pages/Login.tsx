@@ -84,7 +84,7 @@ const LoginButton = styled.button`
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error } = useLogin();
+  const { login, isLoading } = useLogin();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
