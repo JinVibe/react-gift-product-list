@@ -1,4 +1,4 @@
-import { GenderFilter, RankingType, Product } from '../types/ranking';
+import type { GenderFilter, RankingType, Product } from '../types/ranking';
 
 export const fetchRankingProducts = async (filter: GenderFilter, rankingType: RankingType): Promise<Product[]> => {
   const url = filter === 'all' 

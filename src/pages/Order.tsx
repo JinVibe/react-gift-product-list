@@ -7,6 +7,9 @@ import { cardTemplates } from "@/Components/cardTemplates";
 import { useParams } from "react-router-dom";
 import { products } from "@/data/products";
 import { useState } from 'react';
+import { useProductSummary } from "@/hooks/useProductSummary";
+import { useOrder } from "@/hooks/useOrder";
+import { getUserInfo } from "@/utils/storage";
 
 // ===== 타입 정의 및 Zod 스키마 =====
 const receiverSchema = z.object({
@@ -343,7 +346,16 @@ const ModalButton = styled.button`
 
 const Order = () => {
   const { id } = useParams();
-  const product = products.find(p => String(p.id) === String(id));
+  const productId = id ? parseInt(id) : 0;
+  
+  // Custom Hooks 사용
+  const { product, loading: productLoading, error: productError } = useProductSummary(productId);
+  const { order, isLoading: orderLoading, error: orderError } = useOrder();
+  
+  // userInfo에서 name 가져오기
+  const userInfo = getUserInfo();
+  const senderName = userInfo?.name || "";
+  
   const selectedCardDefault = cardTemplates[0];
 
   // react-hook-form 세팅 (메인 폼, Zod resolver 적용)
@@ -352,7 +364,7 @@ const Order = () => {
     defaultValues: {
       selectedCardId: selectedCardDefault?.id ?? 0,
       message: selectedCardDefault?.defaultTextMessage ?? "",
-      sender: "",
+      sender: senderName, // userInfo의 name을 defaultValue로 설정
       receivers: []
     }
   });
@@ -400,16 +412,60 @@ const Order = () => {
   };
 
   // 주문 제출 핸들러
-  const onSubmit = (data: OrderFormValues) => {
-    // TODO: 유효성 검사/중복 체크 등은 다음 단계에서 추가
-    alert(JSON.stringify(data, null, 2));
+  const onSubmit = async (data: OrderFormValues) => {
+    if (!userInfo?.authToken) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // 주문 데이터 준비
+    const orderData = {
+      productId: productId,
+      senderName: data.sender,
+      senderEmail: userInfo.email,
+      receiverName: data.receivers[0]?.name || '',
+      receiverEmail: '', // 받는 사람 이메일은 별도로 입력받지 않으므로 빈 문자열
+      message: data.message,
+    };
+
+    const result = await order(orderData, userInfo.authToken);
+    if (result) {
+      // 주문 성공 시 처리 (예: 주문 완료 페이지로 이동)
+      console.log('주문 성공:', result);
+    }
   };
+
+  // 제품 로딩 중이거나 에러인 경우 처리
+  if (productLoading) {
+    return <Layout><div>제품 정보를 불러오는 중...</div></Layout>;
+  }
+
+  if (productError || !product) {
+    return <Layout><div>제품 정보를 불러올 수 없습니다.</div></Layout>;
+  }
 
   // 선택된 카드
   const selectedCard = cardTemplates.find(card => card.id === watch("selectedCardId"));
 
   return (
     <Layout>
+      {/* ===== 제품 정보 섹션 ===== */}
+      <ProductSection>
+        <ProductTitle>선택한 상품</ProductTitle>
+        <ProductBox>
+          <ProductImg src={product.imageURL} alt={product.name} />
+          <ProductInfo>
+            <ProductName>{product.name}</ProductName>
+            <div style={{ color: '#666', fontSize: '0.95rem' }}>
+              {product.brandInfo?.name}
+            </div>
+            <div style={{ fontWeight: 700, color: '#222', marginTop: 4 }}>
+              {product.price?.sellingPrice?.toLocaleString()}원
+            </div>
+          </ProductInfo>
+        </ProductBox>
+      </ProductSection>
+
       {/* ===== 카드 선택 섹션 ===== */}
       <h2>카드 템플릿 선택</h2>
       <CardList>
@@ -444,6 +500,7 @@ const Order = () => {
         <SenderInput
           type="text"
           placeholder="이름을 입력하세요."
+          defaultValue={senderName}
           {...register("sender", { required: "보내는 사람 이름을 입력하세요." })}
         />
         {errors.sender && <ErrorMessage>{errors.sender.message}</ErrorMessage>}
@@ -497,6 +554,13 @@ const Order = () => {
         </OrderButton>
       </ReceiverSection>
 
+      {/* ===== 주문 버튼 ===== */}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <OrderButton type="submit" disabled={orderLoading}>
+          {orderLoading ? "주문 처리 중..." : "주문하기"}
+        </OrderButton>
+      </form>
+
       {/* ===== 받는 사람 입력/수정 모달 ===== */}
       {receiverModalOpen && (
         <ModalOverlay onClick={() => setReceiverModalOpen(false)}>
@@ -539,68 +603,14 @@ const Order = () => {
                     {...modalRegister(`receivers.${idx}.quantity`)}
                   />
                 </ReceiverRow>
-                {/* 에러 메시지 */}
-                {modalErrors.receivers?.[idx]?.name && <ErrorMessage>{modalErrors.receivers[idx]?.name?.message}</ErrorMessage>}
-                {modalErrors.receivers?.[idx]?.phone && <ErrorMessage>{modalErrors.receivers[idx]?.phone?.message}</ErrorMessage>}
-                {modalErrors.receivers?.[idx]?.quantity && <ErrorMessage>{modalErrors.receivers[idx]?.quantity?.message}</ErrorMessage>}
               </div>
             ))}
-            {/* 배열 전체 중복 에러 메시지 */}
-            {modalErrors.receivers?.root?.message && (
-              <ErrorMessage>{modalErrors.receivers.root.message}</ErrorMessage>
-            )}
-            <ModalActions>
-              <ModalButton type="button" onClick={() => setReceiverModalOpen(false)} style={{ background: '#f5f6fa', color: '#222' }}>취소</ModalButton>
-              <ModalButton
-                type="button"
-                onClick={handleReceiverModalComplete}
-                style={{
-                  background: modalFields.length > 0 && Object.keys(modalErrors).length === 0 && modalWatch('receivers').every(r => r.name && /^010[0-9]{8}$/.test(r.phone) && r.quantity >= 1) ? '#f7e244' : '#f5f6fa',
-                  color: '#222',
-                  fontWeight: 700
-                }}
-                disabled={
-                  modalFields.length === 0 ||
-                  Object.keys(modalErrors).length > 0 ||
-                  !modalWatch('receivers').every(
-                    r => r.name && /^010[0-9]{8}$/.test(r.phone) && r.quantity >= 1
-                  )
-                }
-              >
-                {modalFields.length}명 완료
-              </ModalButton>
-            </ModalActions>
+            <ModalButton type="button" onClick={handleReceiverModalComplete}>
+              완료
+            </ModalButton>
           </ModalContent>
         </ModalOverlay>
       )}
-
-      {/* ===== 상품 정보 섹션 ===== */}
-      <ProductSection>
-        <ProductTitle>상품 정보</ProductTitle>
-        {product ? (
-          <ProductBox>
-            <ProductImg src={product.imageUrl} alt={product.name} />
-            <ProductInfo>
-              <ProductName>{product.name}</ProductName>
-              <ProductBrand>{product.brand}</ProductBrand>
-              <ProductPrice>상품가 <b>{product.price.toLocaleString()}원</b></ProductPrice>
-            </ProductInfo>
-          </ProductBox>
-        ) : (
-          <div>상품 정보를 불러올 수 없습니다.</div>
-        )}
-      </ProductSection>
-
-      {/* ===== 고정 푸터 (주문 버튼) ===== */}
-      <PageWrapper>
-        <FixedFooter>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <OrderButton type="submit">
-              주문하기
-            </OrderButton>
-          </form>
-        </FixedFooter>
-      </PageWrapper>
     </Layout>
   );
 };
