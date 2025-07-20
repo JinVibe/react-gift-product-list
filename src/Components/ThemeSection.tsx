@@ -1,74 +1,9 @@
 import { useEffect, useState } from "react";
-import styled from '@emotion/styled';
 
 type Theme = {
-  id?: number;
-  themeId?: number;
+  id: number;
   name: string;
-  image?: string;
-  imageURL?: string;
 };
-
-const CategoryItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-const CategoryImage = styled.img`
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
-  object-fit: cover;
-  background: #f7f7fa;
-  margin-bottom: 10px;
-  border: none;
-`;
-const CategoryName = styled.div`
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #222;
-  text-align: center;
-  letter-spacing: -0.2px;
-  white-space: nowrap;
-`;
-
-const ThemeGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 32px 0;
-  justify-items: center;
-  margin-top: 24px;
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  @media (max-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-const ThemeCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-const ThemeImage = styled.img`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #f7f7fa;
-  margin-bottom: 12px;
-`;
-const ThemeName = styled.div`
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #222;
-  text-align: center;
-`;
 
 const ThemeSection = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -102,15 +37,14 @@ const ThemeSection = () => {
       });
   }, []);
 
+
   return (
-    <ThemeGrid>
-      {themes.map((theme) => (
-        <CategoryItem key={theme.themeId || theme.id}>
-          <CategoryImage src={theme.image || theme.imageURL || '/default-image.png'} alt={theme.name} />
-          <CategoryName>{theme.name}</CategoryName>
-        </CategoryItem>
+    <div>
+      {/* 테마 목록 렌더링 */}
+      {themes && themes.map((theme) => (
+        <div key={theme.id}>{theme.name}</div>
       ))}
-    </ThemeGrid>
+    </div>
   );
 };
 

@@ -155,7 +155,10 @@ const RankingSection = () => {
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    fetch(filter === 'all' ? '/api/products/ranking' : `/api/products/ranking?gender=${filter}`)
+    const url = filter === 'all' 
+      ? `/api/products/ranking?type=${rankingType}` 
+      : `/api/products/ranking?gender=${filter}&type=${rankingType}`;
+    fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error("API Error");
         return res.json();
@@ -170,7 +173,7 @@ const RankingSection = () => {
         setProducts(productsWithType);
         setShowAll(false); // 필터 변경 시 자동으로 접기
       });
-  }, [filter]);
+  }, [filter, rankingType]);
 
   return (
     <Section>
