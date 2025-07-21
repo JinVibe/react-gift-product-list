@@ -1,8 +1,7 @@
 import styled from "@emotion/styled";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Layout } from "@/Components/layout/Layout";
-import { useLogin } from "@/hooks/useLogin";
-import { useState } from "react";
+import { useLoginForm } from "@/hooks/useLoginForm";
 
 const LoginWrapper = styled.div`
   flex: 1;
@@ -84,78 +83,27 @@ const LoginButton = styled.button`
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading } = useLogin();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError("이메일을 입력해주세요.");
-      return false;
-    }
-    if (!emailRegex.test(email)) {
-      setEmailError("올바른 이메일 형식을 입력해주세요.");
-      return false;
-    }
-    setEmailError("");
-    return true;
-  };
-
-  const validatePassword = (password: string) => {
-    if (!password) {
-      setPasswordError("비밀번호를 입력해주세요.");
-      return false;
-    }
-    if (password.length < 6) {
-      setPasswordError("비밀번호는 6자 이상이어야 합니다.");
-      return false;
-    }
-    setPasswordError("");
-    return true;
-  };
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    if (emailError) validateEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-    if (passwordError) validatePassword(e.target.value);
-  };
-
-  const handleEmailBlur = () => {
-    validateEmail(email);
-  };
-
-  const handlePasswordBlur = () => {
-    validatePassword(password);
-  };
-
-  const isFormValid = email && password && !emailError && !passwordError;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateEmail(email) || !validatePassword(password)) {
-      return;
-    }
-
-    const userInfo = await login({ email, password });
-
-    if (userInfo) {
+  const {
+    email,
+    emailError,
+    handleEmailChange,
+    handleEmailBlur,
+    password,
+    passwordError,
+    handlePasswordChange,
+    handlePasswordBlur,
+    isFormValid,
+    handleSubmit,
+  } = useLoginForm({
+    onSuccess: () => {
       const redirect = location.state?.redirect;
       if (redirect) {
         navigate(redirect);
       } else {
         navigate("/");
       }
-    }
-  };
+    },
+  });
 
   return (
     <Layout>
@@ -182,8 +130,8 @@ const Login = () => {
             onBlur={handlePasswordBlur}
           />
           <ErrorMessage>{passwordError}</ErrorMessage>
-          <LoginButton type="submit" disabled={!isFormValid || isLoading}>
-            {isLoading ? "로그인 중..." : "로그인"}
+          <LoginButton type="submit" disabled={!isFormValid}>
+            로그인
           </LoginButton>
         </Form>
       </LoginWrapper>
