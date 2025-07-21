@@ -1,9 +1,20 @@
 import type { GenderFilter, RankingType, Product } from '../types/ranking';
 
+const targetTypeMap: Record<GenderFilter, string> = {
+  all: 'ALL',
+  male: 'MALE',
+  female: 'FEMALE',
+  teen: 'TEEN',
+};
+
+const rankTypeMap: Record<RankingType, string> = {
+  wanted: 'MANY_WISH',
+  given: 'MANY_RECEIVE',
+  wished: 'MANY_WISH_RECEIVE',
+};
+
 export const fetchRankingProducts = async (filter: GenderFilter, rankingType: RankingType): Promise<Product[]> => {
-  const url = filter === 'all' 
-    ? `/api/products/ranking?type=${rankingType}` 
-    : `/api/products/ranking?gender=${filter}&type=${rankingType}`;
+  const url = `/api/products/ranking?targetType=${targetTypeMap[filter]}&rankType=${rankTypeMap[rankingType]}`;
   
   const res = await fetch(url);
   const data = await res.json();
