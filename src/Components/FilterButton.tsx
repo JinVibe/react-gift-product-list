@@ -1,13 +1,15 @@
 import React from "react";
 import styled from "@emotion/styled";
 
-const Button = styled.button<{active?: boolean}>`
+const Button = styled.button<{ active?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: ${({active, theme}) => active ? theme.colors.blue.blue700 : theme.colors.gray.gray100};
-  color: ${({active, theme}) => active ? theme.colors.gray.gray00 : theme.colors.gray.gray900};
+  background: ${({ active, theme }) =>
+    active ? theme.colors.blue.blue700 : theme.colors.gray.gray100};
+  color: ${({ active, theme }) =>
+    active ? theme.colors.gray.gray00 : theme.colors.gray.gray900};
   border: none;
   border-radius: 50%;
   width: 56px;
@@ -39,4 +41,4 @@ const FilterButton = ({ active, onClick, icon, label }: FilterButtonProps) => (
   </Button>
 );
 
-export default FilterButton; 
+export default FilterButton;

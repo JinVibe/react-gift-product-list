@@ -85,7 +85,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading } = useLogin();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -140,13 +140,13 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateEmail(email) || !validatePassword(password)) {
       return;
     }
 
     const userInfo = await login({ email, password });
-    
+
     if (userInfo) {
       const redirect = location.state?.redirect;
       if (redirect) {

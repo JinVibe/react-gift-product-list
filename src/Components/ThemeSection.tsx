@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
 type Theme = {
   id?: number;
@@ -68,7 +68,7 @@ const ThemeSection = () => {
         return res.json();
       })
       .then((data) => {
-        console.log('[API] /api/products/ranking 응답:', data);
+        console.log("[API] /api/products/ranking 응답:", data);
         if (Array.isArray(data)) {
           setThemes(data);
         } else if (Array.isArray(data.data)) {
@@ -86,7 +86,10 @@ const ThemeSection = () => {
     <ThemeGrid>
       {themes.map((theme, idx) => (
         <ThemeCard key={theme.id ?? theme.themeId ?? theme.name ?? idx}>
-          <ThemeImage src={theme.imageURL || '/default-image.png'} alt={theme.name} />
+          <ThemeImage
+            src={theme.imageURL || "/default-image.png"}
+            alt={theme.name}
+          />
           <ThemeName>{theme.name}</ThemeName>
         </ThemeCard>
       ))}
@@ -94,4 +97,4 @@ const ThemeSection = () => {
   );
 };
 
-export default ThemeSection; 
+export default ThemeSection;

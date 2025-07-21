@@ -33,4 +33,4 @@ export interface ProductError {
 export interface OrderError {
   message: string;
   status?: number;
-} 
+}

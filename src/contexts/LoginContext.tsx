@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import type { ReactNode } from "react";
 
 export interface User {
@@ -17,10 +24,10 @@ const LoginContext = createContext<LoginContextType | undefined>(undefined);
 // 데이터 유효성 검증 함수
 const isValidUser = (data: unknown): data is User => {
   return (
-    typeof data === 'object' &&
+    typeof data === "object" &&
     data !== null &&
-    'email' in data &&
-    typeof (data as any).email === 'string' &&
+    "email" in data &&
+    typeof (data as any).email === "string" &&
     (data as any).email.length > 0
   );
 };
@@ -65,12 +72,15 @@ export function LoginProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Context value 메모이제이션
-  const contextValue = useMemo(() => ({
-    user,
-    isLoggedIn,
-    login,
-    logout,
-  }), [user, isLoggedIn, login, logout]);
+  const contextValue = useMemo(
+    () => ({
+      user,
+      isLoggedIn,
+      login,
+      logout,
+    }),
+    [user, isLoggedIn, login, logout],
+  );
 
   return (
     <LoginContext.Provider value={contextValue}>
@@ -82,7 +92,9 @@ export function LoginProvider({ children }: { children: ReactNode }) {
 export function useLoginContext() {
   const context = useContext(LoginContext);
   if (!context) {
-    throw new Error("useLoginContext는 LoginProvider 안에서만 사용해야 합니다.");
+    throw new Error(
+      "useLoginContext는 LoginProvider 안에서만 사용해야 합니다.",
+    );
   }
   return context;
-} 
+}

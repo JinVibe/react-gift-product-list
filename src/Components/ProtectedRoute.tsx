@@ -1,5 +1,5 @@
-import { useLoginContext } from '@/contexts/LoginContext'
-import { Navigate } from 'react-router-dom'
+import { useLoginContext } from "@/contexts/LoginContext";
+import { Navigate } from "react-router-dom";
 
 interface Props {
   children: React.ReactNode;
@@ -14,4 +14,4 @@ const ProtectedRoute = ({ children }: Props) => {
   return <>{children}</>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

@@ -23,13 +23,13 @@ export function useLoginForm(options?: UseLoginFormOptions) {
   const emailInput = useInput("", validateEmail);
   const passwordInput = useInput("", validatePassword);
 
-  const isFormValid = 
-    validateEmail(emailInput.value) === "" && 
+  const isFormValid =
+    validateEmail(emailInput.value) === "" &&
     validatePassword(passwordInput.value) === "";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (isFormValid) {
       // 1. Context에 로그인 정보 저장
       login({ email: emailInput.value });
@@ -45,13 +45,13 @@ export function useLoginForm(options?: UseLoginFormOptions) {
     emailError: emailInput.error,
     handleEmailChange: emailInput.handleChange,
     handleEmailBlur: emailInput.handleBlur,
-    
+
     password: passwordInput.value,
     passwordError: passwordInput.error,
     handlePasswordChange: passwordInput.handleChange,
     handlePasswordBlur: passwordInput.handleBlur,
-    
+
     isFormValid,
     handleSubmit,
   };
-} 
+}

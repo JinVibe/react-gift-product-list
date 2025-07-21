@@ -1,10 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import { css, useTheme } from '@emotion/react'
-import type { Theme } from '@emotion/react'
-import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded'
-import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { useLoginContext } from '@/contexts/LoginContext'
+import { css, useTheme } from "@emotion/react";
+import type { Theme } from "@emotion/react";
+import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useLoginContext } from "@/contexts/LoginContext";
 
 const statusBarStyle = (theme: Theme) => css`
   width: 100%;
@@ -13,7 +13,7 @@ const statusBarStyle = (theme: Theme) => css`
   @media (min-width: 720px) {
     display: none;
   }
-`
+`;
 
 const headerStyle = (theme: Theme) => css`
   display: flex;
@@ -28,7 +28,7 @@ const headerStyle = (theme: Theme) => css`
   max-width: 720px;
   margin: 0 auto;
   border-bottom: 1px solid ${theme.colors.gray.gray200};
-`
+`;
 
 const iconButtonStyle = (theme: Theme) => css`
   display: flex;
@@ -41,23 +41,23 @@ const iconButtonStyle = (theme: Theme) => css`
   cursor: pointer;
   color: ${theme.colors.gray.gray900};
   font-size: 1.7rem;
-`
+`;
 
 const logoStyle = (theme: Theme) => css`
   font-size: 1.25rem;
   font-weight: 700;
   color: ${theme.colors.brown.brown800};
   letter-spacing: -0.5px;
-  font-family: 'Pretendard', 'Apple SD Gothic Neo', Arial, sans-serif;
+  font-family: "Pretendard", "Apple SD Gothic Neo", Arial, sans-serif;
   flex: 1;
   text-align: center;
-`
+`;
 
 const Header = () => {
-  const theme = useTheme()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { isLoggedIn } = useLoginContext()
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isLoggedIn } = useLoginContext();
   return (
     <>
       <div css={statusBarStyle(theme)} />
@@ -73,13 +73,17 @@ const Header = () => {
         <button
           css={iconButtonStyle(theme)}
           aria-label="프로필"
-          onClick={() => isLoggedIn ? navigate('/my') : navigate('/login', { state: { from: location } })}
+          onClick={() =>
+            isLoggedIn
+              ? navigate("/my")
+              : navigate("/login", { state: { from: location } })
+          }
         >
           <PersonOutlineRoundedIcon fontSize="inherit" />
         </button>
       </header>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

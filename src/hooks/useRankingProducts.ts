@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
-import { fetchRankingProducts } from '../api/ranking';
-import type { GenderFilter, RankingType, Product } from '../types/ranking';
+import { useState, useEffect } from "react";
+import { fetchRankingProducts } from "../api/ranking";
+import type { GenderFilter, RankingType, Product } from "../types/ranking";
 
-export const useRankingProducts = (filter: GenderFilter, rankingType: RankingType) => {
+export const useRankingProducts = (
+  filter: GenderFilter,
+  rankingType: RankingType,
+) => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -24,4 +27,4 @@ export const useRankingProducts = (filter: GenderFilter, rankingType: RankingTyp
   }, [filter, rankingType]);
 
   return { products, loading, error };
-}; 
+};

@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 const Card = styled.article`
   background: ${({ theme }) => theme.colors.gray.gray00};
   border-radius: 16px;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
   padding: 18px 16px 16px 16px;
   display: flex;
   flex-direction: column;
@@ -74,4 +74,4 @@ const ProductCard = ({ rank, image, brand, name, price }: ProductCardProps) => (
   </Card>
 );
 
-export default ProductCard; 
+export default ProductCard;

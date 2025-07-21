@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export function useInput<T = string>(
   initialValue: T,
-  validator?: (value: T) => string
+  validator?: (value: T) => string,
 ) {
   const [value, setValue] = useState<T>(initialValue);
   const [error, setError] = useState("");
@@ -10,7 +10,7 @@ export function useInput<T = string>(
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value as T;
     setValue(newValue);
-    
+
     if (error && validator) {
       const validationError = validator(newValue);
       setError(validationError);
@@ -38,4 +38,4 @@ export function useInput<T = string>(
     setValue,
     setError,
   };
-} 
+}

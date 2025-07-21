@@ -1,18 +1,18 @@
 import { useState } from "react";
-import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
-import { useRankingProducts } from '../hooks/useRankingProducts';
-import type { GenderFilter, RankingType } from '../types/ranking';
-import { rankingTypeOptions } from '../types/ranking';
+import styled from "@emotion/styled";
+import { useNavigate } from "react-router-dom";
+import { useRankingProducts } from "../hooks/useRankingProducts";
+import type { GenderFilter, RankingType } from "../types/ranking";
+import { rankingTypeOptions } from "../types/ranking";
 
 // 상수 및 타입 선언
 const VISIBLE_COUNT = 6;
 
 const filterOptions: { key: GenderFilter; label: string }[] = [
-  { key: 'all', label: '전체' },
-  { key: 'male', label: '남자' },
-  { key: 'female', label: '여자' },
-  { key: 'teen', label: '청소년' },
+  { key: "all", label: "전체" },
+  { key: "male", label: "남자" },
+  { key: "female", label: "여자" },
+  { key: "teen", label: "청소년" },
 ];
 
 // styled-components 선언
@@ -33,13 +33,13 @@ const FilterRow = styled.div`
   margin-bottom: 18px;
   justify-content: center;
 `;
-const FilterBtn = styled.button<{active?: boolean}>`
+const FilterBtn = styled.button<{ active?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: ${({active}) => active ? '#4A90E2' : '#F0F0F0'};
-  color: ${({active}) => active ? '#fff' : '#222'};
+  background: ${({ active }) => (active ? "#4A90E2" : "#F0F0F0")};
+  color: ${({ active }) => (active ? "#fff" : "#222")};
   border: none;
   border-radius: 50%;
   width: 56px;
@@ -70,7 +70,7 @@ const Grid = styled.div`
 const Card = styled.article`
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
   padding: 18px 16px 16px 16px;
   display: flex;
   flex-direction: column;
@@ -120,8 +120,8 @@ const Price = styled.span`
 const MoreBtn = styled.button`
   display: block;
   margin: 0 auto 0 auto;
-  background: #F0F0F0;
-  color: #4A90E2;
+  background: #f0f0f0;
+  color: #4a90e2;
   border: none;
   border-radius: 24px;
   font-size: 1.1rem;
@@ -137,15 +137,17 @@ const MoreBtn = styled.button`
 
 const RankingSection = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<GenderFilter>('all');
-  const [rankingType, setRankingType] = useState<RankingType>('wanted');
+  const [filter, setFilter] = useState<GenderFilter>("all");
+  const [rankingType, setRankingType] = useState<RankingType>("wanted");
   const [showAll, setShowAll] = useState(false);
-  
+
   // Custom Hook 사용
   const { products } = useRankingProducts(filter, rankingType);
 
   // 상품 필터링 로직 제거
-  const visibleProducts = showAll ? (products || []) : (products?.slice(0, VISIBLE_COUNT) || []);
+  const visibleProducts = showAll
+    ? products || []
+    : products?.slice(0, VISIBLE_COUNT) || [];
 
   // 상품 카드 클릭 핸들러
   const handleProductClick = (productId: number) => {
@@ -156,7 +158,7 @@ const RankingSection = () => {
     <Section>
       <Title>실시간 급상승 선물랭킹</Title>
       <FilterRow>
-        {filterOptions.map(opt => (
+        {filterOptions.map((opt) => (
           <FilterBtn
             key={opt.key}
             active={filter === opt.key}
@@ -167,20 +169,22 @@ const RankingSection = () => {
         ))}
       </FilterRow>
       {/* 랭킹 타입 필터 버튼 */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-        {rankingTypeOptions.map(opt => (
+      <div
+        style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}
+      >
+        {rankingTypeOptions.map((opt) => (
           <button
             key={opt.key}
             onClick={() => setRankingType(opt.key)}
             style={{
-              background: rankingType === opt.key ? '#4A90E2' : '#F0F0F0',
-              color: rankingType === opt.key ? '#fff' : '#222',
-              border: 'none',
+              background: rankingType === opt.key ? "#4A90E2" : "#F0F0F0",
+              color: rankingType === opt.key ? "#fff" : "#222",
+              border: "none",
               borderRadius: 16,
-              padding: '10px 24px',
-              margin: '0 8px',
+              padding: "10px 24px",
+              margin: "0 8px",
               fontWeight: 700,
-              cursor: 'pointer'
+              cursor: "pointer",
             }}
           >
             {opt.label}
@@ -202,14 +206,14 @@ const RankingSection = () => {
                 <Price>
                   {typeof item.price?.sellingPrice === "number"
                     ? item.price.sellingPrice.toLocaleString()
-                    : "가격 정보 없음"
-                  }원
+                    : "가격 정보 없음"}
+                  원
                 </Price>
               </Card>
             ))}
           </Grid>
           {(products?.length ?? 0) > VISIBLE_COUNT && (
-            <MoreBtn onClick={() => setShowAll(v => !v)}>
+            <MoreBtn onClick={() => setShowAll((v) => !v)}>
               {showAll ? "접기" : "더보기"}
             </MoreBtn>
           )}

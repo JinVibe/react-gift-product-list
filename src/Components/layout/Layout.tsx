@@ -1,9 +1,9 @@
-import styled from '@emotion/styled'
-import type { ReactNode } from 'react'
-import Header from './Header'
+import styled from "@emotion/styled";
+import type { ReactNode } from "react";
+import Header from "./Header";
 
 interface LayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 const Wrapper = styled.div`
@@ -17,7 +17,7 @@ const Wrapper = styled.div`
     max-width: 720px;
     margin: 0 auto;
     background: ${({ theme }) => theme.colors.gray.gray00};
-    box-shadow: 0 0 8px rgba(0,0,0,0.03);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.03);
   }
 `;
 
@@ -37,5 +37,5 @@ export const Layout = ({ children }: LayoutProps) => {
       <Header />
       <Content>{children}</Content>
     </Wrapper>
-  )
-}
+  );
+};
