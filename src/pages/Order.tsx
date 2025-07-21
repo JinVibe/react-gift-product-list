@@ -404,11 +404,14 @@ const Order = () => {
     // 주문 데이터 준비
     const orderData = {
       productId: productId,
-      senderName: data.sender,
-      senderEmail: userInfo.email,
-      receiverName: data.receivers[0]?.name || '',
-      receiverEmail: '', // 받는 사람 이메일은 별도로 입력받지 않으므로 빈 문자열
       message: data.message,
+      messageCardId: data.selectedCardId.toString(),
+      ordererName: data.sender,
+      receivers: data.receivers.map(r => ({
+        name: r.name,
+        phoneNumber: r.phone,
+        quantity: r.quantity,
+      })),
     };
 
     const result = await order(orderData, userInfo.authToken);

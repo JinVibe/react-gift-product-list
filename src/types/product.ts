@@ -9,11 +9,14 @@ export interface ProductSummary {
 
 export interface OrderRequest {
   productId: number;
-  senderName: string;
-  senderEmail: string;
-  receiverName: string;
-  receiverEmail: string;
-  message?: string;
+  message: string;
+  messageCardId: string;
+  ordererName: string;
+  receivers: {
+    name: string;
+    phoneNumber: string;
+    quantity: number;
+  }[];
 }
 
 export interface OrderResponse {
