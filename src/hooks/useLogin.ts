@@ -17,9 +17,9 @@ export const useLogin = () => {
       
       // UserInfo를 storage에 저장
       const userInfo: UserInfo = {
-        authToken: response.authToken,
-        email: response.email,
-        name: response.name,
+        authToken: response.data.authToken,
+        email: response.data.email,
+        name: response.data.name,
       };
       setUserInfo(userInfo);
       
