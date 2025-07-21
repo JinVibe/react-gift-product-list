@@ -144,9 +144,8 @@ const RankingSection = () => {
   // Custom Hook 사용
   const { products } = useRankingProducts(filter, rankingType);
 
-  // 필터링된 상품 계산
-  const filteredProducts = products?.filter(product => product.rankingType === rankingType) || [];
-  const visibleProducts = showAll ? filteredProducts : filteredProducts.slice(0, VISIBLE_COUNT);
+  // 상품 필터링 로직 제거
+  const visibleProducts = showAll ? (products || []) : (products?.slice(0, VISIBLE_COUNT) || []);
 
   // 상품 카드 클릭 핸들러
   const handleProductClick = (productId: number) => {
@@ -189,7 +188,7 @@ const RankingSection = () => {
         ))}
       </div>
       {/* 상품 리스트 또는 상품 없음 메시지 */}
-      {filteredProducts.length === 0 ? (
+      {(products?.length ?? 0) === 0 ? (
         <div>상품 목록이 없습니다</div>
       ) : (
         <>
@@ -209,7 +208,7 @@ const RankingSection = () => {
               </Card>
             ))}
           </Grid>
-          {filteredProducts.length > VISIBLE_COUNT && (
+          {(products?.length ?? 0) > VISIBLE_COUNT && (
             <MoreBtn onClick={() => setShowAll(v => !v)}>
               {showAll ? "접기" : "더보기"}
             </MoreBtn>

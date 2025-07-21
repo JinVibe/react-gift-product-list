@@ -11,11 +11,5 @@ export const fetchRankingProducts = async (filter: GenderFilter, rankingType: Ra
   if (!res.ok) throw new Error("API Error");
   
   const productsData = Array.isArray(data) ? data : data.data || [];
-  
-  // 비즈니스 로직: rankingType 추가
-  const rankingTypes = ['wanted', 'given', 'wished'] as const;
-  return productsData.map((p: Product, i: number) => ({
-    ...p,
-    rankingType: rankingTypes[i % rankingTypes.length]
-  }));
+  return productsData;
 }; 
