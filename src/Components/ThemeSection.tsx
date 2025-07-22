@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
 
 type Theme = {
-  id?: number;
-  themeId?: number;
+  themeId: number;
   name: string;
-  imageURL?: string;
+  image: string;
 };
 
 const ThemeGrid = styled.div`
@@ -62,19 +61,15 @@ const ThemeSection = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
 
   useEffect(() => {
-    fetch("/api/products/ranking")
+    fetch("/api/themes")
       .then((res) => {
         if (!res.ok) throw new Error("API Error");
         return res.json();
       })
       .then((data) => {
-        console.log("[API] /api/products/ranking 응답:", data);
-        if (Array.isArray(data)) {
-          setThemes(data);
-        } else if (Array.isArray(data.data)) {
+        console.log("[API] /api/themes 응답:", data);
+        if (Array.isArray(data.data)) {
           setThemes(data.data);
-        } else if (Array.isArray(data.products)) {
-          setThemes(data.products);
         } else {
           setThemes([]);
         }
@@ -85,9 +80,9 @@ const ThemeSection = () => {
   return (
     <ThemeGrid>
       {themes.map((theme, idx) => (
-        <ThemeCard key={theme.id ?? theme.themeId ?? theme.name ?? idx}>
+        <ThemeCard key={theme.themeId ?? idx}>
           <ThemeImage
-            src={theme.imageURL || "/default-image.png"}
+            src={theme.image || "/default-image.png"}
             alt={theme.name}
           />
           <ThemeName>{theme.name}</ThemeName>
