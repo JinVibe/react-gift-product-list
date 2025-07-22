@@ -94,6 +94,7 @@ const Login = () => {
     handlePasswordBlur,
     isFormValid,
     handleSubmit,
+    isLoading,
   } = useLoginForm({
     onSuccess: () => {
       const redirect = location.state?.redirect;
@@ -130,8 +131,8 @@ const Login = () => {
             onBlur={handlePasswordBlur}
           />
           <ErrorMessage>{passwordError}</ErrorMessage>
-          <LoginButton type="submit" disabled={!isFormValid}>
-            로그인
+          <LoginButton type="submit" disabled={!isFormValid || isLoading}>
+            {isLoading ? "로그인 중..." : "로그인"}
           </LoginButton>
         </Form>
       </LoginWrapper>

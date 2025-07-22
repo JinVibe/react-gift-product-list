@@ -1,5 +1,7 @@
 import { useInput } from "./useInput";
 import { useLoginContext } from "../contexts/LoginContext";
+import { useLogin } from "./useLogin";
+import { toast } from "react-toastify";
 
 interface UseLoginFormOptions {
   onSuccess?: () => void;
@@ -7,6 +9,8 @@ interface UseLoginFormOptions {
 
 export function useLoginForm(options?: UseLoginFormOptions) {
   const { login } = useLoginContext();
+  const { login: loginApi, isLoading } = useLogin();
+  
   const validateEmail = (value: string) => {
     if (!value) return "ID를 입력해주세요.";
     const emailRegex = /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/;
@@ -27,15 +31,29 @@ export function useLoginForm(options?: UseLoginFormOptions) {
     validateEmail(emailInput.value) === "" &&
     validatePassword(passwordInput.value) === "";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isFormValid) {
-      // 1. Context에 로그인 정보 저장
-      login({ email: emailInput.value });
-      // 2. 그 후에 onSuccess(navigate) 실행
-      if (options && options.onSuccess) {
-        options.onSuccess();
+      try {
+        // 1. API 요청으로 로그인
+        const userInfo = await loginApi({ 
+          email: emailInput.value, 
+          password: passwordInput.value 
+        });
+        
+        if (userInfo) {
+          // 2. Context에 로그인 정보 저장 (스토리지도 함께 저장됨)
+          login(userInfo);
+          
+          // 3. 성공 시 onSuccess 실행
+          if (options && options.onSuccess) {
+            options.onSuccess();
+          }
+        }
+      } catch (error) {
+        // 에러는 useLogin에서 이미 토스트로 처리됨
+        console.error("로그인 실패:", error);
       }
     }
   };
@@ -53,5 +71,6 @@ export function useLoginForm(options?: UseLoginFormOptions) {
 
     isFormValid,
     handleSubmit,
+    isLoading,
   };
 }
