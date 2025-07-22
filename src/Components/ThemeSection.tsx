@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
-
-type Theme = {
-  themeId: number;
-  name: string;
-  image: string;
-};
+import { fetchThemes, type Theme } from "../api/themes";
 
 const ThemeGrid = styled.div`
   display: grid;
@@ -61,18 +56,9 @@ const ThemeSection = () => {
   const [themes, setThemes] = useState<Theme[]>([]);
 
   useEffect(() => {
-    fetch("/api/themes")
-      .then((res) => {
-        if (!res.ok) throw new Error("API Error");
-        return res.json();
-      })
+    fetchThemes()
       .then((data) => {
-        console.log("[API] /api/themes 응답:", data);
-        if (Array.isArray(data.data)) {
-          setThemes(data.data);
-        } else {
-          setThemes([]);
-        }
+        setThemes(data);
       })
       .catch(() => {});
   }, []);
