@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
 import styled from "@emotion/styled";
-import { fetchThemes, type Theme } from "../api/themes";
+import { useThemes } from "../hooks/useThemes";
 
 const ThemeGrid = styled.div`
   display: grid;
@@ -53,15 +52,15 @@ const ThemeName = styled.div`
 `;
 
 const ThemeSection = () => {
-  const [themes, setThemes] = useState<Theme[]>([]);
+  const { themes, loading, error } = useThemes();
 
-  useEffect(() => {
-    fetchThemes()
-      .then((data) => {
-        setThemes(data);
-      })
-      .catch(() => {});
-  }, []);
+  if (loading) {
+    return <div>테마를 불러오는 중...</div>;
+  }
+
+  if (error || !themes) {
+    return <div>테마를 불러올 수 없습니다.</div>;
+  }
 
   return (
     <ThemeGrid>
