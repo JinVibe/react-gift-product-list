@@ -1,32 +1,19 @@
-import { useEffect, useState } from "react";
-import styled from '@emotion/styled';
+import { useState } from "react";
+import styled from "@emotion/styled";
+import { useNavigate } from "react-router-dom";
+import { useRankingProducts } from "../hooks/useRankingProducts";
+import type { GenderFilter, RankingType } from "../types/ranking";
+import { rankingTypeOptions } from "../types/ranking";
 
 // 상수 및 타입 선언
 const VISIBLE_COUNT = 6;
 
-type GenderFilter = 'all' | 'male' | 'female' | 'teen';
 const filterOptions: { key: GenderFilter; label: string }[] = [
-  { key: 'all', label: '전체' },
-  { key: 'male', label: '남자' },
-  { key: 'female', label: '여자' },
-  { key: 'teen', label: '청소년' },
+  { key: "all", label: "전체" },
+  { key: "male", label: "남자" },
+  { key: "female", label: "여자" },
+  { key: "teen", label: "청소년" },
 ];
-
-const rankingTypeOptions = [
-  { key: 'wanted', label: '받고 싶어한' },
-  { key: 'given', label: '많이 선물한' },
-  { key: 'wished', label: '위시로 받은' },
-] as const;
-type RankingType = typeof rankingTypeOptions[number]['key'];
-
-type Product = {
-  id: number;
-  name: string;
-  imageURL: string;
-  brandInfo?: { name: string };
-  price?: { sellingPrice: number };
-  rankingType?: RankingType;
-};
 
 // styled-components 선언
 const Section = styled.section`
@@ -46,13 +33,13 @@ const FilterRow = styled.div`
   margin-bottom: 18px;
   justify-content: center;
 `;
-const FilterBtn = styled.button<{active?: boolean}>`
+const FilterBtn = styled.button<{ active?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: ${({active}) => active ? '#4A90E2' : '#F0F0F0'};
-  color: ${({active}) => active ? '#fff' : '#222'};
+  background: ${({ active }) => (active ? "#4A90E2" : "#F0F0F0")};
+  color: ${({ active }) => (active ? "#fff" : "#222")};
   border: none;
   border-radius: 50%;
   width: 56px;
@@ -83,7 +70,7 @@ const Grid = styled.div`
 const Card = styled.article`
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
   padding: 18px 16px 16px 16px;
   display: flex;
   flex-direction: column;
@@ -133,8 +120,8 @@ const Price = styled.span`
 const MoreBtn = styled.button`
   display: block;
   margin: 0 auto 0 auto;
-  background: #F0F0F0;
-  color: #4A90E2;
+  background: #f0f0f0;
+  color: #4a90e2;
   border: none;
   border-radius: 24px;
   font-size: 1.1rem;
@@ -149,34 +136,29 @@ const MoreBtn = styled.button`
 `;
 
 const RankingSection = () => {
-  const [products, setProducts] = useState<Product[] | null>(null);
-  const [filter, setFilter] = useState<GenderFilter>('all');
-  const [rankingType, setRankingType] = useState<RankingType>('wanted');
+  const navigate = useNavigate();
+  const [filter, setFilter] = useState<GenderFilter>("all");
+  const [rankingType, setRankingType] = useState<RankingType>("wanted");
   const [showAll, setShowAll] = useState(false);
 
-  useEffect(() => {
-    fetch(filter === 'all' ? '/api/products/ranking' : `/api/products/ranking?gender=${filter}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("API Error");
-        return res.json();
-      })
-      .then((data) => {
-        const productsData = Array.isArray(data) ? data : data.data || [];
-        const rankingTypes = ['wanted', 'given', 'wished'];
-        const productsWithType = productsData.map((p: Product, i: number) => ({
-          ...p,
-          rankingType: rankingTypes[i % rankingTypes.length]
-        }));
-        setProducts(productsWithType);
-        setShowAll(false); // 필터 변경 시 자동으로 접기
-      });
-  }, [filter]);
+  // Custom Hook 사용
+  const { products } = useRankingProducts(filter, rankingType);
+
+  // 상품 필터링 로직 제거
+  const visibleProducts = showAll
+    ? products || []
+    : products?.slice(0, VISIBLE_COUNT) || [];
+
+  // 상품 카드 클릭 핸들러
+  const handleProductClick = (productId: number) => {
+    navigate(`/order/${productId}`);
+  };
 
   return (
     <Section>
       <Title>실시간 급상승 선물랭킹</Title>
       <FilterRow>
-        {filterOptions.map(opt => (
+        {filterOptions.map((opt) => (
           <FilterBtn
             key={opt.key}
             active={filter === opt.key}
@@ -187,20 +169,22 @@ const RankingSection = () => {
         ))}
       </FilterRow>
       {/* 랭킹 타입 필터 버튼 */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-        {rankingTypeOptions.map(opt => (
+      <div
+        style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}
+      >
+        {rankingTypeOptions.map((opt) => (
           <button
             key={opt.key}
             onClick={() => setRankingType(opt.key)}
             style={{
-              background: rankingType === opt.key ? '#4A90E2' : '#F0F0F0',
-              color: rankingType === opt.key ? '#fff' : '#222',
-              border: 'none',
+              background: rankingType === opt.key ? "#4A90E2" : "#F0F0F0",
+              color: rankingType === opt.key ? "#fff" : "#222",
+              border: "none",
               borderRadius: 16,
-              padding: '10px 24px',
-              margin: '0 8px',
+              padding: "10px 24px",
+              margin: "0 8px",
               fontWeight: 700,
-              cursor: 'pointer'
+              cursor: "pointer",
             }}
           >
             {opt.label}
@@ -208,13 +192,13 @@ const RankingSection = () => {
         ))}
       </div>
       {/* 상품 리스트 또는 상품 없음 메시지 */}
-      {products && products.filter(product => product.rankingType === rankingType).length === 0 ? (
+      {(products?.length ?? 0) === 0 ? (
         <div>상품 목록이 없습니다</div>
       ) : (
         <>
           <Grid>
-            {products && products.filter(product => product.rankingType === rankingType).slice(0, showAll ? undefined : VISIBLE_COUNT).map((item, idx) => (
-              <Card key={item.id}>
+            {visibleProducts.map((item, idx) => (
+              <Card key={item.id} onClick={() => handleProductClick(item.id)}>
                 <RankBadge>{idx + 1}</RankBadge>
                 <ProductImg src={item.imageURL} alt={item.name} />
                 <Brand>{item.brandInfo?.name}</Brand>
@@ -222,14 +206,14 @@ const RankingSection = () => {
                 <Price>
                   {typeof item.price?.sellingPrice === "number"
                     ? item.price.sellingPrice.toLocaleString()
-                    : "가격 정보 없음"
-                  }원
+                    : "가격 정보 없음"}
+                  원
                 </Price>
               </Card>
             ))}
           </Grid>
-          {products && products.filter(product => product.rankingType === rankingType).length > VISIBLE_COUNT && (
-            <MoreBtn onClick={() => setShowAll(v => !v)}>
+          {(products?.length ?? 0) > VISIBLE_COUNT && (
+            <MoreBtn onClick={() => setShowAll((v) => !v)}>
               {showAll ? "접기" : "더보기"}
             </MoreBtn>
           )}

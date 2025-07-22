@@ -1,9 +1,9 @@
-import { Layout } from '@/Components/layout/Layout'
-import CategorySection from '@/Components/CategorySection'
-import GiftFriendsSection from '@/Components/GiftFriendsSection'
-import KakaocampCheerSection from '@/Components/KakaocampCheerSection'
-import RankingSection from '@/Components/RankingSection'
-import ThemeSection from '@/Components/ThemeSection'
+import { Layout } from "@/Components/layout/Layout";
+import CategorySection from "@/Components/CategorySection";
+import GiftFriendsSection from "@/Components/GiftFriendsSection";
+import KakaocampCheerSection from "@/Components/KakaocampCheerSection";
+import RankingSection from "@/Components/RankingSection";
+import ThemeSection from "@/Components/ThemeSection";
 
 const Home = () => {
   return (
@@ -14,7 +14,7 @@ const Home = () => {
       <KakaocampCheerSection />
       <RankingSection />
     </Layout>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

@@ -1,117 +1,80 @@
-import { useEffect, useState } from "react";
-import styled from '@emotion/styled';
-
-type Theme = {
-  id?: number;
-  themeId?: number;
-  name: string;
-  image?: string;
-  imageURL?: string;
-};
-
-const CategoryItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-const CategoryImage = styled.img`
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
-  object-fit: cover;
-  background: #f7f7fa;
-  margin-bottom: 10px;
-  border: none;
-`;
-const CategoryName = styled.div`
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #222;
-  text-align: center;
-  letter-spacing: -0.2px;
-  white-space: nowrap;
-`;
+import styled from "@emotion/styled";
+import { useThemes } from "../hooks/useThemes";
 
 const ThemeGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 32px 0;
+  grid-template-columns: repeat(2, 1fr); // 모바일 2열
+  gap: 20px 0;
   justify-items: center;
-  margin-top: 24px;
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  @media (max-width: 900px) {
+  align-items: center;
+  width: 100%;
+
+  @media (min-width: 600px) {
     grid-template-columns: repeat(3, 1fr);
   }
-  @media (max-width: 600px) {
-    grid-template-columns: repeat(2, 1fr);
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(5, 1fr);
   }
 `;
+
 const ThemeCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  max-width: 110px;
+  width: 100%;
 `;
+
 const ThemeImage = styled.img`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
   object-fit: cover;
   background: #f7f7fa;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  border: none;
 `;
+
 const ThemeName = styled.div`
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 700;
+  font-size: 1rem;
   color: #222;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100px;
 `;
 
 const ThemeSection = () => {
-  const [themes, setThemes] = useState<Theme[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { themes, loading, error } = useThemes();
 
-  useEffect(() => {
-    setLoading(true);
-    setError(false);
-    fetch("/api/themes")
-      .then((res) => {
-        if (!res.ok) throw new Error("API Error");
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setThemes(data);
-        } else if (Array.isArray(data.data)) {
-          setThemes(data.data);
-        } else if (Array.isArray(data.themes)) {
-          setThemes(data.themes);
-        } else {
-          setThemes([]);
-        }
-      })
-      .catch(() => {
-        setError(true);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  if (loading) {
+    return <div>테마를 불러오는 중...</div>;
+  }
+
+  if (error || !themes) {
+    return <div>테마를 불러올 수 없습니다.</div>;
+  }
 
   return (
     <ThemeGrid>
-      {themes.map((theme) => (
-        <CategoryItem key={theme.themeId || theme.id}>
-          <CategoryImage src={theme.image || theme.imageURL || '/default-image.png'} alt={theme.name} />
-          <CategoryName>{theme.name}</CategoryName>
-        </CategoryItem>
+      {themes.map((theme, idx) => (
+        <ThemeCard key={theme.themeId ?? idx}>
+          <ThemeImage
+            src={theme.image || "/default-image.png"}
+            alt={theme.name}
+          />
+          <ThemeName>{theme.name}</ThemeName>
+        </ThemeCard>
       ))}
     </ThemeGrid>
   );
 };
 
-export default ThemeSection; 
+export default ThemeSection;

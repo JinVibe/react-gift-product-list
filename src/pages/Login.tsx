@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
-import { useLoginForm } from "@/hooks/useLoginForm";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Layout } from "@/Components/layout/Layout";
+import { useLoginForm } from "@/hooks/useLoginForm";
 
 const LoginWrapper = styled.div`
   flex: 1;
@@ -83,18 +83,18 @@ const LoginButton = styled.button`
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // 커스텀 훅에서 모든 상태와 핸들러를 받아옴
   const {
     email,
-    password,
     emailError,
-    passwordError,
-    isFormValid,
     handleEmailChange,
     handleEmailBlur,
+    password,
+    passwordError,
     handlePasswordChange,
     handlePasswordBlur,
+    isFormValid,
     handleSubmit,
+    isLoading,
   } = useLoginForm({
     onSuccess: () => {
       const redirect = location.state?.redirect;
@@ -103,7 +103,7 @@ const Login = () => {
       } else {
         navigate("/");
       }
-    }
+    },
   });
 
   return (
@@ -131,8 +131,8 @@ const Login = () => {
             onBlur={handlePasswordBlur}
           />
           <ErrorMessage>{passwordError}</ErrorMessage>
-          <LoginButton type="submit" disabled={!isFormValid}>
-            로그인
+          <LoginButton type="submit" disabled={!isFormValid || isLoading}>
+            {isLoading ? "로그인 중..." : "로그인"}
           </LoginButton>
         </Form>
       </LoginWrapper>

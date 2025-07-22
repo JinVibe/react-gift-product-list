@@ -56,7 +56,7 @@ const LogoutButton = styled.button`
   cursor: pointer;
   transition: background 0.2s;
   margin-top: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
   &:hover {
     background: #ffe14a;
   }
@@ -85,4 +85,4 @@ const MyPage = () => {
   );
 };
 
-export default MyPage; 
+export default MyPage;

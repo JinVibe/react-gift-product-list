@@ -1,9 +1,9 @@
-import { Global, css } from '@emotion/react'
+import { Global, css } from "@emotion/react";
 
 const GlobalStyle = () => (
   <Global
     styles={css`
-      @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+      @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
       * {
         margin: 0;
@@ -11,8 +11,9 @@ const GlobalStyle = () => (
         box-sizing: border-box;
       }
 
-      html, body {
-        font-family: 'Pretendard', 'Apple SD Gothic Neo', Arial, sans-serif;
+      html,
+      body {
+        font-family: "Pretendard", "Apple SD Gothic Neo", Arial, sans-serif;
         background-color: #fff;
         color: #222;
         line-height: 1.5;
@@ -30,7 +31,9 @@ const GlobalStyle = () => (
         background: #fff;
       }
 
-      button, input, textarea {
+      button,
+      input,
+      textarea {
         font-family: inherit;
       }
 
@@ -43,6 +46,6 @@ const GlobalStyle = () => (
       }
     `}
   />
-)
+);
 
-export default GlobalStyle
+export default GlobalStyle;
