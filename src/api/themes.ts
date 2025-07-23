@@ -12,6 +12,30 @@ export interface ThemeDetail {
   backgroundColor: string;
 }
 
+export interface ThemeProduct {
+  id: number;
+  name: string;
+  price: {
+    basicPrice: number;
+    sellingPrice: number;
+    discountRate: number;
+  };
+  imageURL: string;
+  brandInfo: {
+    id: number;
+    name: string;
+    imageURL: string;
+  };
+}
+
+export interface ThemeProductsResponse {
+  data: {
+    list: ThemeProduct[];
+    cursor: number;
+    hasMoreList: boolean;
+  };
+}
+
 export interface ThemesResponse {
   data: Theme[];
 }
@@ -34,6 +58,25 @@ export const fetchThemeDetail = async (themeId: number): Promise<ThemeDetail> =>
   const response = await fetch(`/api/themes/${themeId}/info`);
   const data = await response.json();
   console.log(`[API] /api/themes/${themeId}/info 응답:`, data);
+  
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Theme not found");
+    }
+    throw new Error("API Error");
+  }
+  
+  return data.data;
+};
+
+export const fetchThemeProducts = async (
+  themeId: number, 
+  cursor: number = 0, 
+  limit: number = 10
+): Promise<ThemeProductsResponse['data']> => {
+  const response = await fetch(`/api/themes/${themeId}/products?cursor=${cursor}&limit=${limit}`);
+  const data = await response.json();
+  console.log(`[API] /api/themes/${themeId}/products 응답:`, data);
   
   if (!response.ok) {
     if (response.status === 404) {
