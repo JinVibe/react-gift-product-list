@@ -11,17 +11,18 @@ export const useInfiniteScroll = (
   onLoadMore: () => void,
   hasMore: boolean,
   loading: boolean,
+  error?: any,
   options: UseInfiniteScrollOptions = {}
 ) => {
   const { enabled = true, rootMargin = '100px', threshold = 0.1 } = options;
 
   const handleIntersection = useCallback(
     (isIntersecting: boolean) => {
-      if (isIntersecting && hasMore && !loading && enabled) {
+      if (isIntersecting && hasMore && !loading && !error && enabled) {
         onLoadMore();
       }
     },
-    [hasMore, loading, enabled, onLoadMore]
+    [hasMore, loading, error, enabled, onLoadMore]
   );
 
   const { ref, isIntersecting } = useIntersectionObserver(handleIntersection, {

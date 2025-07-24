@@ -93,7 +93,7 @@ const ThemeProducts = () => {
   const { themeDetail, loading: themeLoading, error: themeError } = useThemeDetail(Number(themeId));
   const { products, loading: productsLoading, error: productsError, hasMore, loadMore } = useThemeProducts(Number(themeId));
   
-  const { ref: intersectionRef } = useInfiniteScroll(loadMore, hasMore, productsLoading);
+  const { ref: intersectionRef } = useInfiniteScroll(loadMore, hasMore, productsLoading, productsError);
 
   // 404 에러 시 홈으로 리다이렉트
   useEffect(() => {
