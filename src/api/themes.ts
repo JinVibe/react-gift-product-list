@@ -1,3 +1,5 @@
+import { createAppError, createThemeNotFoundError, createApiError, ERROR_MESSAGES } from '../constants/errors';
+
 export interface Theme {
   themeId: number;
   name: string;
@@ -45,28 +47,44 @@ export interface ThemeDetailResponse {
 }
 
 export const fetchThemes = async (): Promise<Theme[]> => {
-  const response = await fetch('/api/themes');
-  const data = await response.json();
-  console.log('[API] /api/themes 응답:', data);
-  
-  if (!response.ok) throw new Error("API Error");
-  
-  return data.data || [];
+  try {
+    const response = await fetch('/api/themes');
+    const data = await response.json();
+    console.log('[API] /api/themes 응답:', data);
+    
+    if (!response.ok) {
+      throw createApiError(response.status);
+    }
+    
+    return data.data || [];
+  } catch (error) {
+    if (error instanceof Error) {
+      throw createAppError(ERROR_MESSAGES.API_ERROR, 0, error);
+    }
+    throw error;
+  }
 };
 
 export const fetchThemeDetail = async (themeId: number): Promise<ThemeDetail> => {
-  const response = await fetch(`/api/themes/${themeId}/info`);
-  const data = await response.json();
-  console.log(`[API] /api/themes/${themeId}/info 응답:`, data);
-  
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error("Theme not found");
+  try {
+    const response = await fetch(`/api/themes/${themeId}/info`);
+    const data = await response.json();
+    console.log(`[API] /api/themes/${themeId}/info 응답:`, data);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw createThemeNotFoundError();
+      }
+      throw createApiError(response.status);
     }
-    throw new Error("API Error");
+    
+    return data.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw createAppError(ERROR_MESSAGES.API_ERROR, 0, error);
+    }
+    throw error;
   }
-  
-  return data.data;
 };
 
 export const fetchThemeProducts = async (
@@ -74,16 +92,23 @@ export const fetchThemeProducts = async (
   cursor: number = 0, 
   limit: number = 10
 ): Promise<ThemeProductsResponse['data']> => {
-  const response = await fetch(`/api/themes/${themeId}/products?cursor=${cursor}&limit=${limit}`);
-  const data = await response.json();
-  console.log(`[API] /api/themes/${themeId}/products 응답:`, data);
-  
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error("Theme not found");
+  try {
+    const response = await fetch(`/api/themes/${themeId}/products?cursor=${cursor}&limit=${limit}`);
+    const data = await response.json();
+    console.log(`[API] /api/themes/${themeId}/products 응답:`, data);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw createThemeNotFoundError();
+      }
+      throw createApiError(response.status);
     }
-    throw new Error("API Error");
+    
+    return data.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw createAppError(ERROR_MESSAGES.API_ERROR, 0, error);
+    }
+    throw error;
   }
-  
-  return data.data;
 }; 

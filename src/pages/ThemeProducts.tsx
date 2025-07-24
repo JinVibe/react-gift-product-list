@@ -5,6 +5,7 @@ import { Layout } from '@/Components/layout/Layout';
 import { useThemeDetail } from '@/hooks/useThemeDetail';
 import { useThemeProducts } from '@/hooks/useThemeProducts';
 import ProductCard from '@/Components/ProductCard';
+import { ERROR_CODES } from '@/constants/errors';
 
 const HeroSection = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -95,7 +96,7 @@ const ThemeProducts = () => {
 
   // 404 에러 시 홈으로 리다이렉트
   useEffect(() => {
-    if (themeError === "Theme not found" || productsError === "Theme not found") {
+    if (themeError?.code === ERROR_CODES.NOT_FOUND || productsError?.code === ERROR_CODES.NOT_FOUND) {
       navigate('/', { replace: true });
     }
   }, [themeError, productsError, navigate]);
@@ -138,10 +139,10 @@ const ThemeProducts = () => {
     );
   }
 
-  if (themeError && themeError !== "Theme not found") {
+  if (themeError && themeError.code !== ERROR_CODES.NOT_FOUND) {
     return (
       <Layout>
-        <ErrorMessage>테마 정보를 불러올 수 없습니다.</ErrorMessage>
+        <ErrorMessage>{themeError.message}</ErrorMessage>
       </Layout>
     );
   }
@@ -182,8 +183,8 @@ const ThemeProducts = () => {
               <LoadingIndicator>상품을 불러오는 중...</LoadingIndicator>
             )}
             
-            {productsError && productsError !== "Theme not found" && (
-              <ErrorMessage>상품을 불러올 수 없습니다.</ErrorMessage>
+            {productsError && productsError.code !== ERROR_CODES.NOT_FOUND && (
+              <ErrorMessage>{productsError.message}</ErrorMessage>
             )}
             
             <IntersectionTarget ref={intersectionRef} />

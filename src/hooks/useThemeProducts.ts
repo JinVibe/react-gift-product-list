@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchThemeProducts } from '../api/themes';
 import type { ThemeProduct } from '../api/themes';
+import type { AppError } from '../constants/errors';
 
 export const useThemeProducts = (themeId: number) => {
   const [products, setProducts] = useState<ThemeProduct[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [cursor, setCursor] = useState(0);
 
@@ -22,7 +23,7 @@ export const useThemeProducts = (themeId: number) => {
       setCursor(data.cursor);
       setHasMore(data.hasMoreList);
     } catch (err: any) {
-      setError(err.message);
+      setError(err);
     } finally {
       setLoading(false);
     }
