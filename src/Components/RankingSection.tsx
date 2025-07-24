@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRankingProducts } from "../hooks/useRankingProducts";
 import type { GenderFilter, RankingType } from "../types/ranking";
 import { rankingTypeOptions } from "../types/ranking";
+import ProductCard from "./ProductCard";
 
 // 상수 및 타입 선언
 const VISIBLE_COUNT = 6;
@@ -198,18 +199,13 @@ const RankingSection = () => {
         <>
           <Grid>
             {visibleProducts.map((item, idx) => (
-              <Card key={item.id} onClick={() => handleProductClick(item.id)}>
-                <RankBadge>{idx + 1}</RankBadge>
-                <ProductImg src={item.imageURL} alt={item.name} />
-                <Brand>{item.brandInfo?.name}</Brand>
-                <ProductName>{item.name}</ProductName>
-                <Price>
-                  {typeof item.price?.sellingPrice === "number"
-                    ? item.price.sellingPrice.toLocaleString()
-                    : "가격 정보 없음"}
-                  원
-                </Price>
-              </Card>
+              <ProductCard
+                key={item.id}
+                product={item}
+                onClick={handleProductClick}
+                showRankBadge={true}
+                rankNumber={idx + 1}
+              />
             ))}
           </Grid>
           {(products?.length ?? 0) > VISIBLE_COUNT && (

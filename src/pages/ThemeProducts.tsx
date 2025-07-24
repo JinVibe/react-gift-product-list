@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { Layout } from '@/Components/layout/Layout';
 import { useThemeDetail } from '@/hooks/useThemeDetail';
 import { useThemeProducts } from '@/hooks/useThemeProducts';
-import ThemeProductCard from '@/Components/ThemeProductCard';
+import ProductCard from '@/Components/ProductCard';
 
 const HeroSection = styled.div<{ backgroundColor?: string }>`
   width: 100%;
@@ -170,7 +170,7 @@ const ThemeProducts = () => {
           <>
             <ProductsGrid>
               {products.map((product) => (
-                <ThemeProductCard
+                <ProductCard
                   key={product.id}
                   product={product}
                   onClick={handleProductClick}
