@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect } from 'react';
 import styled from '@emotion/styled';
 import { Layout } from '@/Components/layout/Layout';
 import { useThemeDetail } from '@/hooks/useThemeDetail';
 import { useThemeProducts } from '@/hooks/useThemeProducts';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import ProductCard from '@/Components/ProductCard';
 import { ERROR_CODES } from '@/constants/errors';
 
@@ -92,7 +93,7 @@ const ThemeProducts = () => {
   const { themeDetail, loading: themeLoading, error: themeError } = useThemeDetail(Number(themeId));
   const { products, loading: productsLoading, error: productsError, hasMore, loadMore } = useThemeProducts(Number(themeId));
   
-  const intersectionRef = useRef<HTMLDivElement>(null);
+  const { ref: intersectionRef } = useInfiniteScroll(loadMore, hasMore, productsLoading);
 
   // 404 에러 시 홈으로 리다이렉트
   useEffect(() => {
@@ -100,32 +101,6 @@ const ThemeProducts = () => {
       navigate('/', { replace: true });
     }
   }, [themeError, productsError, navigate]);
-
-  // Intersection Observer 설정
-  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    const [entry] = entries;
-    if (entry.isIntersecting && hasMore && !productsLoading) {
-      loadMore();
-    }
-  }, [hasMore, productsLoading, loadMore]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(handleIntersection, {
-      root: null,
-      rootMargin: '100px',
-      threshold: 0.1,
-    });
-
-    if (intersectionRef.current) {
-      observer.observe(intersectionRef.current);
-    }
-
-    return () => {
-      if (intersectionRef.current) {
-        observer.unobserve(intersectionRef.current);
-      }
-    };
-  }, [handleIntersection]);
 
   const handleProductClick = (productId: number) => {
     navigate(`/order/${productId}`);
